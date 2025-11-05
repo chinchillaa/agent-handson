@@ -195,10 +195,16 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "agent-framework" },
+    { name = "azure-identity" },
+    { name = "python-dotenv" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "agent-framework", specifier = ">=1.0.0b251104" }]
+requires-dist = [
+    { name = "agent-framework", specifier = ">=1.0.0b251104" },
+    { name = "azure-identity", specifier = ">=1.25.1" },
+    { name = "python-dotenv", specifier = ">=1.2.1" },
+]
 
 [[package]]
 name = "annotated-doc"
