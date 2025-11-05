@@ -11,3 +11,6 @@ wheels/
 
 # Environment variables
 .env
+
+# Repository docs (ignored)
+AGENTS.md
