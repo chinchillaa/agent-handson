@@ -2,32 +2,72 @@
 
 Microsoft Agent FrameworkとAzure OpenAI Service (GPT-5)を使ったAIエージェントハンズオン
 
-## プロジェクト概要
+## 📋 プロジェクト概要
 
-このリポジトリには2つのプロジェクトが含まれています。
+このリポジトリには2つのAIエージェントハンズオンプロジェクトが含まれています。
 
-### 01_multi-llm-reasoning
-複数のLLMを使ったマルチエージェント推論システム
+### ✅ 01_multi-llm-reasoning（実装完了）
+**4つのAIエージェントによる協調推論システム**
 
-- **概要**: 4つのエージェント（Coordinator、Researcher、Analyzer、Summarizer）が連携して複雑な推論タスクを実行
-- **使用技術**: Microsoft Agent Framework、Azure OpenAI Service (GPT-5)
-- **予算規模**: 2.5億円
+- **概要**: Coordinator、Researcher、Analyzer、Summarizerの4エージェントが連携して複雑な推論タスクを実行
+- **実装状況**: ✅ **完全実装済み**（Phase 1-4完了）
+- **主な機能**:
+  - 🎯 Coordinator: 質問を分析し調査計画を立案
+  - 🔍 Researcher: Web検索で最新情報を収集（GPT-5-mini）
+  - 📊 Analyzer: データ分析とコードインタープリター
+  - 📝 Summarizer: Markdown形式で最終回答を生成
+  - 🛠️ **17種類のカスタムツール**搭載（Web検索支援、データ分析、テキスト整形）
+- **使用技術**: Microsoft Agent Framework、Azure OpenAI Service (GPT-5/GPT-5-mini)
+- **詳細**: [01_multi-llm-reasoning/README.md](./01_multi-llm-reasoning/README.md)
 
-### 02_azure-voice-chatbot
-Azure音声サービスを使ったマルチエージェント音声チャットボット
+### 🚧 02_azure-voice-chatbot（未実装）
+**Azure音声サービスを使ったマルチエージェント音声チャットボット**
 
 - **概要**: Azure Speech Servicesとagent-frameworkを使った音声対話システム
+- **実装状況**: 🚧 未実装
 - **使用技術**: Azure Speech Services、Microsoft Agent Framework
+
+## 🚀 クイックスタート
+
+```bash
+# 1. リポジトリをクローン
+git clone https://github.com/chinchillaa/agent-handson.git
+cd agent-handson
+
+# 2. 依存パッケージをインストール（仮想環境も自動作成）
+uv sync
+
+# 3. 環境変数を設定
+cp .env.example .env
+# .envファイルを編集してAzure OpenAI認証情報を設定
+
+# 4. Azure認証（Azure CLI使用の場合）
+az login
+
+# 5. 実行！
+uv run python 01_multi-llm-reasoning/main.py "量子コンピューターについて教えてください"
+```
+
+詳細なセットアップ手順は [セットアップ手順](#セットアップ手順) を参照してください。
 
 ## 環境要件
 
-### 必要なもの
+### 必須環境
 
-- Python 3.11以上
-- [uv](https://github.com/astral-sh/uv) パッケージマネージャー
-- Azureサブスクリプション
-- Azure OpenAI Service へのアクセス（GPT-5モデルが利用可能）
-- Azure CLI（推奨）
+- **Python**: 3.11以上
+- **uv**: パッケージマネージャー（[インストール方法](https://github.com/astral-sh/uv)）
+- **Azure環境**:
+  - Azure サブスクリプション
+  - Azure OpenAI Service リソース
+  - GPT-5 / GPT-5-mini モデルのデプロイメント
+- **Git**: リポジトリのクローン用
+
+### 推奨環境
+
+- **Azure CLI**: 認証に使用（`az login`）
+- **Visual Studio Code**: 開発・デバッグ用
+
+## セットアップ手順
 
 ### 1. リポジトリのクローン
 
@@ -72,47 +112,84 @@ uv sync
 
 ## 使用方法
 
-### 01_multi-llm-reasoning の実行
+### 📊 01_multi-llm-reasoning の実行
+
+#### 基本的な使い方
 
 ```bash
 # コマンドライン引数で質問を指定
 uv run python 01_multi-llm-reasoning/main.py "量子コンピューターについて詳しく教えてください"
 
-# シンプルな例
+# インタラクティブモード（引数なし）
+uv run python 01_multi-llm-reasoning/main.py
+
+# 詳細出力（各エージェントの出力を表示）
+uv run python 01_multi-llm-reasoning/main.py "質問内容" --verbose
+
+# 結果をMarkdownファイルに保存
+uv run python 01_multi-llm-reasoning/main.py "質問内容" --save-output
+```
+
+#### サンプルスクリプトの実行
+
+```bash
+# シンプルな質問の例
 uv run python 01_multi-llm-reasoning/examples/simple_query.py
 
-# 複雑な推論の例
+# 複雑な推論が必要な質問の例
 uv run python 01_multi-llm-reasoning/examples/complex_reasoning.py
 ```
 
-### 02_azure-voice-chatbot の実行
+詳細は [01_multi-llm-reasoning/README.md](./01_multi-llm-reasoning/README.md) を参照してください。
+
+### 🚧 02_azure-voice-chatbot の実行
 
 ```bash
-# 音声チャットボットを起動
+# 音声チャットボットを起動（未実装）
 uv run python 02_azure-voice-chatbot/main.py
 ```
+
+**注意**: このプロジェクトは現在未実装です。
 
 ## プロジェクト構造
 
 ```
 agent-handson/
-├── .env.example              # 環境変数のサンプル
-├── .env                      # 環境変数（gitignoreに含まれる）
+├── .env.example              # 環境変数のサンプル（詳細なコメント付き）
+├── .env                      # 環境変数（.gitignoreに含まれる）
 ├── pyproject.toml            # uv設定ファイル・依存関係
 ├── uv.lock                   # 依存パッケージのロックファイル
-├── .venv/                    # 仮想環境（uvで自動作成）
+├── .venv/                    # 仮想環境（uv syncで自動作成）
+├── README.md                 # このファイル
+├── PROJECT_HISTORY.md        # 開発履歴
+├── CLAUDE.md                 # 開発ガイド
 │
-├── 01_multi-llm-reasoning/   # プロジェクト1
-│   ├── DESIGN.md             # 設計書
-│   ├── README.md             # 詳細説明
+├── 01_multi-llm-reasoning/   # ✅ マルチエージェント推論システム（実装完了）
+│   ├── README.md             # 詳細ドキュメント
+│   ├── DESIGN.md             # 設計ドキュメント
+│   ├── main.py               # メインエントリーポイント
+│   ├── workflow.py           # 4エージェント連携ワークフロー
+│   │
 │   ├── agents/               # エージェント実装
-│   ├── config/               # 設定
-│   ├── tools/                # ツール類
-│   ├── examples/             # 実行例
-│   ├── workflow.py           # ワークフロー定義
-│   └── main.py               # エントリーポイント
+│   │   ├── base.py           # ベースエージェント
+│   │   ├── coordinator.py    # 調査計画エージェント（GPT-5）
+│   │   ├── researcher.py     # 情報収集エージェント（GPT-5-mini + Web検索）
+│   │   ├── analyzer.py       # データ分析エージェント（GPT-5 + コードインタープリター）
+│   │   └── summarizer.py     # 最終統合エージェント（GPT-5 + 整形ツール）
+│   │
+│   ├── config/               # 設定管理
+│   │   └── settings.py       # Azure設定・デプロイメント名管理
+│   │
+│   ├── tools/                # カスタムツール（17種類）
+│   │   ├── web_tools.py      # Web検索支援ツール（4個）
+│   │   ├── analysis_tools.py # データ分析ツール（5個）
+│   │   └── formatting_tools.py # テキスト整形ツール（8個）
+│   │
+│   └── examples/             # 実行サンプル
+│       ├── simple_query.py   # シンプルな質問の例
+│       └── complex_reasoning.py # 複雑な推論の例
 │
-└── 02_azure-voice-chatbot/   # プロジェクト2
+└── 02_azure-voice-chatbot/   # 🚧 音声チャットボット（未実装）
     └── README.md
 ```
 
