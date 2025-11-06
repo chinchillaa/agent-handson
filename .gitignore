@@ -12,5 +12,9 @@ wheels/
 # Environment variables
 .env
 
+# Backup directory
+.backup/
+
 # Repository docs (ignored)
 AGENTS.md
+CLAUDE.md

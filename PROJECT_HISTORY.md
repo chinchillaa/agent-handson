@@ -26,6 +26,36 @@
 
 ---
 
+### 2025-11-06 カテゴリ: Docs/Improvement
+- 概要: CLAUDE.md のパッケージ管理セクションを改善（uv add を優先に）
+- 詳細:
+  - `uv add` を新規パッケージ追加の標準コマンドとして明記
+  - `uv pip install` は一時的な用途のみと位置づけ
+  - `uv sync` での依存関係同期を追加
+  - `uv pip freeze` は通常不要と説明（uv.lock が真のソース）
+  - 別環境での依存関係再現手順を追加
+- 関連ファイル: `CLAUDE.md`
+- コミット/PR: 未コミット
+- 作成者: AI assistant (Claude Code)
+- 承認: y（ユーザー）
+- メモ: uvのベストプラクティスに沿った正確な記述に改善
+- 次アクション: 変更をGitコミット
+
+### 2025-11-06 カテゴリ: Bugfix/Encoding
+- 概要: README.md および CLAUDE.md の文字化け修正（UTF-8エンコーディングで再作成）
+- 詳細:
+  - README.md と CLAUDE.md が文字化けしていることを確認（エンコーディング問題）
+  - `.backup/` フォルダを作成し、文字化けファイルをバックアップ
+  - `.gitignore` に `.backup/` を追加してgit追跡外に設定
+  - README.md と CLAUDE.md を UTF-8 エンコーディングで再作成
+  - CLAUDE.md にはプロジェクト固有の開発ルール（PROJECT_HISTORY.md への記録、uvの使用徹底など）を記載
+- 関連ファイル: `README.md`, `CLAUDE.md`, `.gitignore`, `.backup/`
+- コミット/PR: 未コミット
+- 作成者: AI assistant (Claude Code)
+- 承認: y（ユーザー）
+- メモ: バックアップファイルは `.backup/README.md.20251106_131828`, `.backup/CLAUDE.md.20251106_131828` として保存
+- 次アクション: 変更をGitコミット
+
 ### 2025-11-05 カテゴリ: Docs/Policy
 - 概要: AI運用規範 `AGENTS.md` を追加し、`.gitignore` に除外設定を反映
 - 詳細:
