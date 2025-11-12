@@ -27,6 +27,69 @@
 ---
 
 ### 2025-11-12 カテゴリ: Feature/Implementation
+- 概要: 02_azure-voice-chatbot Phase 3 実装完了（機能拡張・会話支援ツール）
+- 詳細:
+  - **会話要約ツール実装** (tools/conversation_summarizer.py)
+    - ConversationSummarizerクラス
+    - 会話履歴の自動要約機能
+    - トピック抽出（キーワードベース）
+    - 統計情報取得（ターン数、文字数、平均長など）
+    - format_stats()で読みやすい統計表示
+  - **コンテキスト管理実装** (tools/context_manager.py)
+    - ContextManagerクラス
+    - 会話中の重要情報を自動抽出・保持
+    - 重要度別管理（high/normal/low）
+    - ユーザー好み設定の保存・取得
+    - 名前・話題の自動検出機能
+    - コンテキスト項目数の上限管理（デフォルト20件）
+  - **音声プロファイル定義** (config/voice_profiles.py)
+    - VoiceProfileデータクラス
+    - 日本語Neural Voice一覧（6種類：Nanami, Mayu, Shiori, Keita, Daichi, Naoki）
+    - カスタムプロファイル（default, gentle, energetic, calm_male, friendly_male）
+    - 話速プリセット（very_slow～very_fast）
+    - ピッチプリセット（very_low～very_high）
+    - create_custom_profile()でカスタムプロファイル作成
+  - **音声合成機能拡張** (speech/synthesizer.py)
+    - apply_voice_profile()で音声プロファイル適用
+    - speak_with_options()で詳細オプション指定可能（話速・ピッチ・音量）
+    - _generate_ssml()でSSML自動生成
+    - 音声カスタマイズの柔軟性向上
+  - **音声対話ループ強化** (voice_chat.py)
+    - 音声認識失敗時の自動再試行機能（最大3回）
+    - ユーザーフレンドリーな再試行メッセージ
+    - エラーハンドリングの改善
+    - タイムアウト処理の最適化
+  - **高度な対話サンプル作成** (examples/advanced_chat.py)
+    - Phase 3機能のデモンストレーション
+    - テキストのみ対話モード（Phase 3機能体験）
+    - 会話要約・コンテキスト表示・統計情報表示
+    - 音声プロファイル一覧表示
+    - 特殊コマンド対応（summary, context, stats, profile）
+    - 終了時の最終レポート生成
+- 関連ファイル:
+  - `02_azure-voice-chatbot/tools/conversation_summarizer.py`
+  - `02_azure-voice-chatbot/tools/context_manager.py`
+  - `02_azure-voice-chatbot/config/voice_profiles.py`
+  - `02_azure-voice-chatbot/speech/synthesizer.py` (拡張)
+  - `02_azure-voice-chatbot/voice_chat.py` (強化)
+  - `02_azure-voice-chatbot/examples/advanced_chat.py`
+- コミット/PR: 未コミット（ローカル実装）
+- 作成者: AI assistant (Claude Code)
+- 承認: y（ユーザー）
+- メモ:
+  - DESIGN.mdのPhase 3仕様に基づいて実装
+  - 会話支援ツールで対話の質を向上
+  - 音声カスタマイズで多様なユースケースに対応
+  - エラーハンドリング強化でユーザビリティ向上
+  - テスト可能なサンプルコード完備
+- 次アクション:
+  - Gitコミット＆GitHubプッシュ
+  - 実機での動作確認
+  - Phase 4（テストとドキュメント）の検討
+
+---
+
+### 2025-11-12 カテゴリ: Feature/Implementation
 - 概要: 02_azure-voice-chatbot Phase 2 実装完了（エージェント統合・音声対話ループ）
 - 詳細:
   - **エージェント基底モジュール作成** (agents/base.py)

@@ -124,17 +124,34 @@ class VoiceChat:
             print(f"--- ターン {self.turn_count + 1}/{settings.MAX_CONVERSATION_TURNS} ---")
 
             try:
-                # 1. 音声認識
-                print("🎤 音声入力を待機中...")
-                success, user_text = self.recognizer.recognize_once()
+                # 1. 音声認識（Phase 3: 再試行機能追加）
+                user_text = None
+                max_retries = 3  # 最大再試行回数
+                recognition_success = False
 
-                if not success:
-                    print(f"❌ 音声認識エラー: {user_text}")
+                for retry in range(max_retries):
+                    if retry > 0:
+                        print(f"🔄 再試行中... ({retry}/{max_retries - 1})")
+
+                    print("🎤 音声入力を待機中...")
+                    success, user_text = self.recognizer.recognize_once()
+
+                    if success:
+                        # エラーカウンターリセット
+                        self.consecutive_errors = 0
+                        recognition_success = True
+                        break
+                    else:
+                        print(f"❌ 音声認識エラー: {user_text}")
+
+                        if retry < max_retries - 1:
+                            print("💬 もう一度話しかけてください...")
+
+                # 全ての再試行が失敗した場合
+                if not recognition_success:
+                    print("⚠️  音声認識に失敗しました。次のターンに進みます。")
                     self.consecutive_errors += 1
                     continue
-
-                # エラーカウンターリセット
-                self.consecutive_errors = 0
 
                 print(f"📝 認識結果: {user_text}")
 

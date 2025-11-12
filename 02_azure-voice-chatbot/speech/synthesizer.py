@@ -150,6 +150,76 @@ class SpeechSynthesizer:
         self.speech_config.speech_synthesis_voice_name = voice_name
         print(f"🎙️  音声を変更しました: {voice_name}")
 
+    def apply_voice_profile(self, profile):
+        """
+        音声プロファイルを適用（Phase 3追加機能）
+
+        Args:
+            profile: VoiceProfileオブジェクト
+        """
+        self.voice_name = profile.voice_name
+        self.speech_config.speech_synthesis_voice_name = profile.voice_name
+        print(f"🎙️  音声プロファイルを適用: {profile.name}")
+
+    def speak_with_options(
+        self,
+        text: str,
+        rate: float = 1.0,
+        pitch: str = "+0%",
+        volume: str = "+0%"
+    ) -> tuple[bool, str]:
+        """
+        音声オプションを指定して読み上げ（Phase 3追加機能）
+
+        Args:
+            text: 読み上げるテキスト
+            rate: 話速（0.5 ~ 2.0、1.0が標準）
+            pitch: ピッチ（-50% ~ +50%、+0%が標準）
+            volume: 音量（-50% ~ +50%、+0%が標準）
+
+        Returns:
+            (成功フラグ, メッセージ)のタプル
+        """
+        # SSMLを生成
+        ssml = self._generate_ssml(text, rate, pitch, volume)
+
+        # SSML音声合成を実行
+        return self.speak_ssml(ssml)
+
+    def _generate_ssml(
+        self,
+        text: str,
+        rate: float = 1.0,
+        pitch: str = "+0%",
+        volume: str = "+0%"
+    ) -> str:
+        """
+        SSML（Speech Synthesis Markup Language）を生成
+
+        Args:
+            text: 読み上げるテキスト
+            rate: 話速
+            pitch: ピッチ
+            volume: 音量
+
+        Returns:
+            SSML文字列
+        """
+        # 話速をパーセント表記に変換
+        rate_percent = f"{int((rate - 1.0) * 100):+d}%"
+
+        ssml = f"""
+<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="{self.language}">
+    <voice name="{self.voice_name}">
+        <prosody rate="{rate_percent}" pitch="{pitch}" volume="{volume}">
+            {text}
+        </prosody>
+    </voice>
+</speak>
+        """.strip()
+
+        return ssml
+
     def test_speaker(self) -> bool:
         """
         スピーカーの動作確認
