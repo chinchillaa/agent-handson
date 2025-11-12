@@ -1,49 +1,269 @@
 # Azure Voice Chatbot
 
-Azureの音声サービスとagent-frameworkを組み合わせた音声対話型チャットボットのハンズオン
+Azure Speech ServicesとMicrosoft Agent Frameworkを組み合わせた**音声対話型AIチャットボット**
+
+## 📋 目次
+
+- [概要](#概要)
+- [システムアーキテクチャ](#システムアーキテクチャ)
+- [環境要件](#環境要件)
+- [セットアップ手順](#セットアップ手順)
+- [使用方法](#使用方法)
+- [プロジェクト構造](#プロジェクト構造)
+- [トラブルシューティング](#トラブルシューティング)
 
 ## 概要
 
-このハンズオンでは、Azureの音声系サーバーレスシステムとagent-frameworkを組み合わせて、
-音声で対話できるインテリジェントなチャットボットを構築します。
+このプロジェクトは、**Azure Speech Service**と**Microsoft Agent Framework**を組み合わせて、GPT-5と音声で対話できるAIチャットボットを構築するハンズオンです。
 
-## 学習内容
+### 特徴
 
-- Azure Speech Servicesの使い方
-- 音声認識（Speech-to-Text）の実装
-- 音声合成（Text-to-Speech）の実装
-- agent-frameworkとの統合
-- リアルタイム音声対話の実装
+- ✅ **Speech-to-Text**: 日本語音声をリアルタイムでテキスト化
+- ✅ **GPT-5との対話**: マルチターン会話に対応
+- ✅ **Text-to-Speech**: 自然な日本語音声で応答
+- ✅ **シンプルな実装**: 段階的に機能を拡張可能
 
-## 前提条件
+### 動作イメージ
 
-- Python 3.11以上
-- agent-framework 1.0.0b251104以上
-- Azureサブスクリプション
-- Azure Speech Servicesのリソース
-
-## 必要なAzureリソース
-
-- Azure Speech Services
-- Azure Functions（オプション）
-- Azure Storage（オプション）
-
-## セットアップ
-
-```bash
-# 仮想環境の有効化
-source .venv/bin/activate
-
-# Azure SDKのインストール（必要に応じて）
-# uv pip install azure-cognitiveservices-speech
+```
+🎤 ユーザー音声入力
+    ↓
+🔊 Speech-to-Text (Azure Speech Service)
+    ↓
+🤖 VoiceAgent処理 (GPT-5)
+    ↓
+🔉 Text-to-Speech (Azure Speech Service)
+    ↓
+🔊 音声出力
 ```
 
-## 実装予定の機能
+## システムアーキテクチャ
 
-1. 音声入力の認識と処理
-2. agent-frameworkによる応答生成
-3. 音声出力の合成と再生
-4. リアルタイム対話フローの実装
+### 対話フロー
+
+1. **音声入力**: ユーザーがマイクで質問
+2. **音声認識**: Azure Speech Serviceでテキスト化
+3. **エージェント処理**: GPT-5が応答を生成（会話履歴を保持）
+4. **音声合成**: 応答テキストを自然な音声に変換
+5. **音声出力**: スピーカーで再生
+
+### 技術スタック
+
+- **Microsoft Agent Framework** 1.0.0b251104
+- **Azure Speech Service** (Speech-to-Text / Text-to-Speech)
+- **Azure OpenAI Service** (GPT-5)
+- **Python** 3.11+
+- **uv** パッケージマネージャー
+
+## 環境要件
+
+### 必須環境
+
+- **Python**: 3.11以上
+- **uv**: パッケージマネージャー
+- **Azureサブスクリプション**
+- **Azure Speech Service**: 音声認識・合成用
+- **Azure OpenAI Service**: GPT-5モデル
+- **マイクとスピーカー**: 音声入出力用
+
+### 推奨環境
+
+- **Azure CLI**: 認証に使用
+- **静かな環境**: 音声認識の精度向上のため
+
+## セットアップ手順
+
+### 1. リポジトリのクローン（既に実施済みの場合はスキップ）
+
+```bash
+git clone https://github.com/chinchillaa/agent-handson.git
+cd agent-handson/02_azure-voice-chatbot
+```
+
+### 2. 依存パッケージのインストール
+
+```bash
+# プロジェクトルートで実行（uvが依存関係を同期）
+cd ..  # agent-handson/ へ移動
+uv sync
+```
+
+これにより、以下が自動的にインストールされます：
+- `agent-framework`
+- `azure-cognitiveservices-speech`
+- `azure-identity`
+- `python-dotenv`
+
+### 3. Azure Speech Serviceのリソース作成
+
+#### ステップ3-1: Azure Portalにアクセス
+
+https://portal.azure.com にアクセスしてログイン
+
+#### ステップ3-2: Speech Serviceを作成
+
+1. **「リソースの作成」** をクリック
+2. **「AI + Machine Learning」** → **「Speech Services」** を選択
+3. **設定項目を入力**:
+   - **サブスクリプション**: 使用するサブスクリプション
+   - **リソースグループ**: 新規作成（例: `voice-chatbot-rg`）
+   - **リージョン**: `Japan East`（推奨）または `East US`
+   - **名前**: 任意の名前（例: `voice-chatbot-speech`）
+   - **価格レベル**:
+     - テスト用: `Free F0`（月5時間まで無料）
+     - 本格利用: `Standard S0`
+4. **「確認および作成」** → **「作成」** をクリック
+
+#### ステップ3-3: APIキーとリージョンを取得
+
+1. 作成したSpeech Serviceリソースを開く
+2. 左メニューから **「キーとエンドポイント」** を選択
+3. 以下の情報をコピー:
+   - **キー1** (API Key)
+   - **リージョン** (例: `japaneast`)
+
+### 4. 環境変数の設定
+
+```bash
+# プロジェクトルート（agent-handson/）の .env ファイルを編集
+cd ..  # agent-handson/ へ
+nano .env  # または vim .env
+```
+
+#### .envファイルに以下を追加
+
+```bash
+# ========================================
+# Azure Speech Service 設定
+# ========================================
+
+# Speech Service 認証情報
+AZURE_SPEECH_API_KEY=your_speech_api_key_here
+AZURE_SPEECH_REGION=japaneast
+
+# 音声設定
+AZURE_SPEECH_LANGUAGE=ja-JP
+AZURE_SPEECH_VOICE_NAME=ja-JP-NanamiNeural
+
+# ========================================
+# Azure OpenAI Service 設定（既存）
+# ========================================
+# AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
+# AZURE_OPENAI_DEPLOYMENT_GPT5=gpt-5
+# （Azure CLI認証の場合、API Keyは不要）
+```
+
+**利用可能な日本語音声**:
+- `ja-JP-NanamiNeural` (女性・標準的)
+- `ja-JP-KeitaNeural` (男性・落ち着いた)
+- `ja-JP-AoiNeural` (女性・若々しい)
+
+### 5. Azure認証（Azure CLI使用の場合）
+
+```bash
+# Azureにログイン（OpenAI用）
+az login
+
+# サブスクリプションの確認
+az account show
+```
+
+## 使用方法
+
+### 基本的な使い方（Phase 2実装後）
+
+```bash
+# 音声対話を開始
+uv run python 02_azure-voice-chatbot/main.py
+```
+
+### 音声入出力のテスト（Phase 1）
+
+```bash
+# 音声認識・合成のテスト
+uv run python 02_azure-voice-chatbot/examples/test_speech.py
+```
+
+## プロジェクト構造
+
+```
+02_azure-voice-chatbot/
+├── agents/                    # エージェント定義
+│   ├── __init__.py
+│   ├── base.py               # ベースエージェント
+│   └── voice_agent.py        # 音声対話エージェント（Phase 2）
+│
+├── speech/                    # 音声処理モジュール
+│   ├── __init__.py
+│   ├── recognizer.py         # Speech-to-Text
+│   └── synthesizer.py        # Text-to-Speech
+│
+├── config/                    # 設定管理
+│   ├── __init__.py
+│   └── settings.py           # Azure設定
+│
+├── examples/                  # 実行サンプル
+│   ├── __init__.py
+│   ├── test_speech.py        # 音声入出力テスト
+│   └── simple_chat.py        # 音声対話例（Phase 2）
+│
+├── main.py                    # メインエントリーポイント（Phase 2）
+├── voice_chat.py              # 音声対話ループ（Phase 2）
+├── DESIGN.md                  # 設計ドキュメント
+└── README.md                  # このファイル
+```
+
+## トラブルシューティング
+
+### Speech Service認証エラー
+
+```
+❌ エラー: Speech Service認証に失敗しました
+```
+
+**解決方法**:
+```bash
+# .envファイルを確認
+cat ../.env | grep AZURE_SPEECH
+
+# API KeyとリージョンがAzure Portalの値と一致しているか確認
+```
+
+### マイクが認識されない
+
+**解決方法**:
+- マイクが正しく接続されているか確認
+- OSのマイク権限設定を確認
+- 他のアプリケーションがマイクを使用していないか確認
+
+### 音声認識の精度が低い
+
+**解決方法**:
+- 静かな環境で使用
+- マイクを口に近づける
+- バックグラウンドノイズを最小化
+- マイクの品質を確認
+
+### パッケージインストールエラー
+
+```bash
+# 依存関係を再インストール
+uv sync --refresh
+```
+
+## 関連ドキュメント
+
+- **設計ドキュメント**: [DESIGN.md](./DESIGN.md)
+- **プロジェクトルート**: [../README.md](../README.md)
+- **開発履歴**: [../PROJECT_HISTORY.md](../PROJECT_HISTORY.md)
+- **開発ガイド**: [../CLAUDE.md](../CLAUDE.md)
+
+## 参考資料
+
+- [Azure Speech Service Documentation](https://learn.microsoft.com/azure/ai-services/speech-service/)
+- [Speech SDK for Python](https://learn.microsoft.com/azure/ai-services/speech-service/quickstarts/setup-platform?pivots=programming-language-python)
+- [Microsoft Agent Framework](https://github.com/microsoft/agent-framework)
+- [ソフトバンク技術ブログ - Azure Speech Service](https://www.softbank.jp/biz/blog/cloud-technology/articles/202410/azure-speech-service/)
 
 ---
 

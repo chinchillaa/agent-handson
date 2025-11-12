@@ -124,8 +124,8 @@ agent-frameworkの推奨パターンに従った実践的な構造：
 
 2. **依存パッケージインストール**
    ```bash
-   uv pip install agent-framework --pre
-   uv pip install python-dotenv azure-identity
+   uv add agent-framework --pre
+   uv add python-dotenv azure-identity
    ```
 
 3. **環境変数設定**

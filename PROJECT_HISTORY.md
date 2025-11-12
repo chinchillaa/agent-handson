@@ -26,6 +26,102 @@
 
 ---
 
+### 2025-11-12 カテゴリ: Feature/Implementation
+- 概要: 02_azure-voice-chatbot Phase 1 実装完了（基本音声入出力機能）
+- 詳細:
+  - **設計ドキュメント作成**
+    - DESIGN.md: システムアーキテクチャ、Azure Speech Serviceセットアップ手順、実装フェーズ詳細
+    - README.md: 詳細なセットアップ手順、Azure Portalでのリソース作成方法、使用方法
+  - **環境設定**
+    - .env.example: Azure Speech Service設定項目を追加（API Key、リージョン、音声設定）
+    - azure-cognitiveservices-speech 1.47.0 をパッケージ追加
+  - **ディレクトリ構造作成**
+    - agents/, speech/, config/, examples/, tools/ ディレクトリ作成
+    - 各ディレクトリに__init__.pyを配置
+  - **設定モジュール実装** (config/settings.py)
+    - Azure OpenAI + Azure Speech Service 統合設定管理
+    - 無限ループ防止のための安全設定
+      - MAX_CONVERSATION_TURNS（最大対話回数、デフォルト50）
+      - MAX_CONSECUTIVE_ERRORS（連続エラー許容回数、デフォルト3）
+      - MAX_SESSION_DURATION（セッション最大時間、デフォルト30分）
+      - EXIT_KEYWORDS（終了キーワードリスト）
+    - 設定バリデーション機能
+  - **音声認識モジュール実装** (speech/recognizer.py)
+    - Speech-to-Text機能（Azure Speech SDK使用）
+    - 日本語音声認識（ja-JP）
+    - タイムアウト設定によるリソース保護
+    - エラーハンドリング（無音、雑音、キャンセル対応）
+    - マイク動作確認機能
+    - 連続音声認識対応（イベントドリブン）
+  - **音声合成モジュール実装** (speech/synthesizer.py)
+    - Text-to-Speech機能（Azure Speech SDK使用）
+    - 日本語音声合成（Neural Voice: ja-JP-NanamiNeural）
+    - 音声スタイル変更機能
+    - SSML対応（高度な音声制御）
+    - スピーカー動作確認機能
+  - **動作確認スクリプト** (examples/test_speech.py)
+    - Speech-to-Text単体テスト
+    - Text-to-Speech単体テスト
+    - ラウンドトリップテスト（音声認識→音声合成）
+    - インタラクティブなテストメニュー
+- 関連ファイル:
+  - `02_azure-voice-chatbot/DESIGN.md`
+  - `02_azure-voice-chatbot/README.md`
+  - `.env.example`
+  - `pyproject.toml` (azure-cognitiveservices-speech追加)
+  - `02_azure-voice-chatbot/config/settings.py`
+  - `02_azure-voice-chatbot/speech/recognizer.py`
+  - `02_azure-voice-chatbot/speech/synthesizer.py`
+  - `02_azure-voice-chatbot/examples/test_speech.py`
+- コミット/PR: 未コミット（ローカル実装）
+- 作成者: AI assistant (Claude Code)
+- 承認: y（ユーザー）
+- メモ:
+  - Azureリソースの無限ループ防止策を実装に組み込み
+  - 段階的実装方針（Phase 1: 基本音声入出力）を採用
+  - Phase 2以降でエージェント統合を予定
+  - Azure Speech Serviceリソースは未作成（ユーザー側でAzure Portalから作成必要）
+- 次アクション:
+  - Azure PortalでSpeech Serviceリソースを作成
+  - .envファイルに認証情報を設定
+  - examples/test_speech.pyで動作確認
+  - Phase 2: エージェント統合の実装
+
+---
+
+### 2025-11-06 カテゴリ: Tests/Costing
+- 概要: 01_multi-llm-reasoning にpytestテストを追加し、API利用料金の概算見積もり文書を整備（JPY換算込み）
+- 詳細:
+  - tests 追加（すべて外部APIはmock/スタブ）
+    - web_tools / analysis_tools / formatting_tools のユニットテスト
+    - config.settings の環境変数バリデーション挙動テスト
+    - main.py のCLI引数・ワークフロー呼び出し（スタブ）テスト
+    - workflow のFake Agent雛形テスト（相対import事情によりskip）
+  - コスト見積り文書
+    - tests/COST_ESTIMATES.md に概算式・テンプレートを作成
+    - 受領した単価（USD/100万トークン）を1K換算して実数反映（USD/JPY）
+      - GPT-5 Global: 入力 $1.25/100万 → $0.00125/1K、出力 $10/100万 → $0.01000/1K
+      - GPT-5-mini Global: 入力 $0.25/100万 → $0.00025/1K、出力 $2/100万 → $0.00200/1K
+      - 換算レート: 1 USD = 150 JPY
+    - ケース別コスト（1問い合わせあたり）
+      - Case A: $0.01245 ≒ 1.87円、Case B: $0.02115 ≒ 3.17円、Case C: $0.03135 ≒ 4.70円
+  - 付随ファイル: tests/PRICING_SOURCES.todo.md（価格取得手順メモ）
+  - 最小修正: agents/__init__.py にエージェントファクトリのエクスポートを追加
+- 関連ファイル:
+  - `01_multi-llm-reasoning/agents/__init__.py`
+  - `01_multi-llm-reasoning/tests/test_tools_web.py`
+  - `01_multi-llm-reasoning/tests/test_tools_analysis.py`
+  - `01_multi-llm-reasoning/tests/test_tools_formatting.py`
+  - `01_multi-llm-reasoning/tests/test_config.py`
+  - `01_multi-llm-reasoning/tests/test_main_cli.py`
+  - `01_multi-llm-reasoning/tests/test_workflow.py`
+  - `01_multi-llm-reasoning/tests/COST_ESTIMATES.md`
+  - `01_multi-llm-reasoning/tests/PRICING_SOURCES.todo.md`
+- コミット/PR: 未コミット（ローカル変更）
+- 作成者: AI assistant（Codex CLI）
+- 承認: y（ユーザー）
+- メモ: テストは全てローカルロジック検証のためAPIコストは0円。ライブ実行時はCOST_ESTIMATES.md参照。
+
 ### 2025-11-06 カテゴリ: Docs/Documentation
 - 概要: README.mdを実装完了内容に合わせて全面更新
 - 詳細:
@@ -158,4 +254,3 @@
 - 承認: y（ユーザー）
 - メモ: `AGENTS.md` は意図的に未追跡。必要時のみバージョン管理に含める方針。
 - 次アクション: `README.md` から `AGENTS.md` への参照リンク追加（要確認）
-

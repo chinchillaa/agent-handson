@@ -22,7 +22,7 @@ Microsoft Agent FrameworkとAzure OpenAI Service (GPT-5)を使った
 ### 特徴
 
 - ✅ **4段階の推論プロセス**: Coordinator → Researcher → Analyzer → Summarizer
-- ✅ **専門ツール搭載**: Web検索、データ分析、テキスト整形など17種類のカスタムツール
+- ✅ **agent-framework活用**: Agent開発のフレームワークを使い、Web検索、データ分析など17種類のカスタムツールを使いこなすエージェントを実装
 - ✅ **Azure OpenAI GPT-5**: 最新のGPT-5/GPT-5-miniモデルを活用
 - ✅ **コマンドライン対応**: シンプルなCLIインターフェース
 - ✅ **実行例付き**: すぐに試せるサンプルスクリプト

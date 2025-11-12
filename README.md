@@ -44,7 +44,7 @@ cp .env.example .env
 # 4. Azure認証（Azure CLI使用の場合）
 az login
 
-# 5. 実行！
+# 5. 実行
 uv run python 01_multi-llm-reasoning/main.py "量子コンピューターについて教えてください"
 ```
 
