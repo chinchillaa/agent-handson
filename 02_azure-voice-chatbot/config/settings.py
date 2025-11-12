@@ -144,5 +144,5 @@ class Settings:
 # 設定インスタンス
 settings = Settings()
 
-# 起動時に設定を検証
-settings.validate()
+# 注意: 起動時の自動検証はコメントアウト（main.py側で環境チェックを実施）
+# settings.validate()

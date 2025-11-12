@@ -6,7 +6,7 @@ Azure Speech Serviceを使用して音声をテキストに変換します。
 
 import azure.cognitiveservices.speech as speechsdk
 from typing import Optional
-from ..config.settings import settings
+from config.settings import settings
 
 
 class SpeechRecognizer:

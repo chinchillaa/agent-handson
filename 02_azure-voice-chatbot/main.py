@@ -60,7 +60,7 @@ def check_environment():
     print()
     print("【オプション設定】")
     print(f"  Azure OpenAI認証: {'APIキー' if settings.AZURE_OPENAI_API_KEY else 'Azure CLI'}")
-    print(f"  デプロイメント名: {settings.AZURE_OPENAI_DEPLOYMENT_NAME}")
+    print(f"  デプロイメント名: {settings.AZURE_OPENAI_DEPLOYMENT_GPT5}")
     print(f"  音声言語: {settings.AZURE_SPEECH_LANGUAGE}")
     print(f"  音声名: {settings.AZURE_SPEECH_VOICE_NAME}")
     print()
@@ -128,7 +128,7 @@ async def main():
         print("🤖 GPT-5エージェントを初期化中...")
         session = await create_voice_session(
             agent_name=settings.VOICE_AGENT_NAME,
-            deployment_name=settings.AZURE_OPENAI_DEPLOYMENT_NAME
+            deployment_name=settings.AZURE_OPENAI_DEPLOYMENT_GPT5
         )
 
         print("✅ エージェント初期化完了")
