@@ -81,14 +81,64 @@ Azure Speech ServicesとMicrosoft Agent Frameworkを組み合わせた**音声�
 
 ## セットアップ手順
 
-### 1. リポジトリのクローン（既に実施済みの場合はスキップ）
+### 🎓 ハンズオン参加者向けクイックスタート
+
+**主催者から配布されたAPI Keyがある場合、こちらの簡単な手順で5分でセットアップ完了！**
+
+1. **リポジトリをクローン**
+   ```bash
+   git clone https://github.com/chinchillaa/agent-handson.git
+   cd agent-handson
+   ```
+
+2. **環境ファイルを作成**
+   ```bash
+   cp .env.example .env
+   nano .env  # または vim/code .env
+   ```
+
+3. **配布されたAPI Keyを.envに設定**
+   ```bash
+   # Azure OpenAI Service
+   AZURE_OPENAI_ENDPOINT=配布されたエンドポイント
+   AZURE_OPENAI_API_KEY=配布されたOpenAI_API_Key
+   AZURE_OPENAI_DEPLOYMENT_GPT5=gpt-5
+
+   # Azure Speech Service
+   AZURE_SPEECH_API_KEY=配布されたSpeech_API_Key
+   AZURE_SPEECH_REGION=japaneast
+   AZURE_SPEECH_LANGUAGE=ja-JP
+   AZURE_SPEECH_VOICE_NAME=ja-JP-NanamiNeural
+   ```
+
+4. **依存パッケージをインストール**
+   ```bash
+   uv sync
+   ```
+
+5. **動作確認**
+   ```bash
+   cd 02_azure-voice-chatbot
+   uv run python main.py
+   # マイクに向かって「こんにちは」と話しかけてみてください
+   ```
+
+**詳細**: [ハンズオン参加者向けガイド](../.azure/azure_settings.md#-ハンズオン参加者向けクイックスタート)
+
+---
+
+### 💻 自分のAzureアカウントでセットアップする場合
+
+**本格的に学習したい方・継続利用したい方向けの手順**
+
+#### 1. リポジトリのクローン（既に実施済みの場合はスキップ）
 
 ```bash
 git clone https://github.com/chinchillaa/agent-handson.git
 cd agent-handson/02_azure-voice-chatbot
 ```
 
-### 2. 依存パッケージのインストール
+#### 2. 依存パッケージのインストール
 
 ```bash
 # プロジェクトルートで実行（uvが依存関係を同期）
@@ -102,12 +152,16 @@ uv sync
 - `azure-identity`
 - `python-dotenv`
 
-### 3. Azure設定
+#### 3. Azure設定
 
 Azure Speech ServiceとAzure OpenAI Serviceの設定が必要です。
 
 **詳細な設定手順は以下を参照してください**:
 - **[Azure設定ガイド](../.azure/azure_settings.md)** - Azure Speech Service・Azure OpenAI Serviceの作成手順、環境変数設定、認証方法など
+
+**推奨認証方式**:
+- ✅ **Azure CLI認証**（OpenAI用 - セキュリティ高）
+- ✅ **API Key認証**（Speech用 - 現状必須）
 
 ## 使用方法
 

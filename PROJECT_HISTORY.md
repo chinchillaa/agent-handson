@@ -26,6 +26,60 @@
 
 ---
 
+### 2025-11-13 カテゴリ: Documentation/Optimization
+- 概要: ハンズオン参加者向けにシナリオB（主催者提供の共有リソース）最適化
+- 詳細:
+  - **ハンズオン参加者向けクイックスタート追加** (.azure/azure_settings.md)
+    - 5分セットアップ手順（git clone → .env作成 → API Key設定 → uv sync → 実行）
+    - 配布されたAPI Keyを使った簡易セットアップ
+    - セキュリティ注意事項（API Key機密管理、ハンズオン後の削除）
+    - トラブルシューティングFAQ（環境変数エラー、Python/uv未インストール、マイク問題）
+    - 継続学習への案内（Azure CLI認証への移行ガイド）
+  - **主催者向けリソース準備ガイド追加** (.azure/azure_settings.md)
+    - ステップ1-6の完全フロー（リソース作成 → API Key配布 → ハンズオン実行 → 後処理）
+    - API Key配布タイミングと方法（当日配布推奨、Slack DM/プライベートチャンネル）
+    - コスト管理ガイド（使用制限・クォータ設定、予算アラート設定、見積もり例）
+    - 主催者チェックリスト（1週間前、当日、ハンズオン後）
+    - ハンズオン終了後のAPI Key無効化手順
+  - **各プロジェクトREADME最適化** (API Key認証優先)
+    - 01_multi-llm-reasoning/README.md: ハンズオン参加者向けクイックスタートをトップに配置
+    - 02_azure-voice-chatbot/README.md: 同様にAPI Key認証を優先
+    - Azure CLI認証は「自分のAzureアカウントでセットアップする場合」セクションに移動
+    - 継続学習向けの詳細手順は保持
+  - **HANDSON_QUICKSTART.md新規作成** (232行)
+    - 5分セットアップガイド（所要時間明記）
+    - セキュリティ注意事項（GitHub push禁止、SNS共有禁止など）
+    - トラブルシューティングQ&A（Q1-Q4）
+    - 次のステップガイド（プロジェクト1・2の使い方）
+    - Phase 3音声コマンド一覧（要約、音声変更、話速調整など）
+    - ハンズオン終了後の継続学習案内
+  - **.env.example更新**
+    - ハンズオン参加者向け手順をトップに追加
+    - 自分のAzureアカウント使用者向けガイドを併記
+    - 認証方式の違いを明確化
+- 関連ファイル:
+  - `.azure/azure_settings.md` (260行追加)
+  - `01_multi-llm-reasoning/README.md` (構成変更)
+  - `02_azure-voice-chatbot/README.md` (構成変更)
+  - `HANDSON_QUICKSTART.md` (新規作成・232行)
+  - `.env.example` (更新)
+  - `PROJECT_HISTORY.md` (本エントリ)
+- コミット/PR: (次のステップ)
+- 作成者: Claude Code
+- 承認: y（ユーザー）
+- メモ:
+  - シナリオB想定：主催者が共有Azureリソース＋API Keyを提供
+  - ハンズオン参加者のセットアップ時間を5分に短縮
+  - Azure CLI認証は継続学習用として保持（教育的価値維持）
+  - 主催者向けガイドで安全・効率的な運営を支援
+  - API Key配布は当日推奨（事前配布によるリスク回避）
+  - ハンズオン後のAPI Key無効化手順を明記（セキュリティ担保）
+- 次アクション:
+  - 変更のコミット＆GitHubプッシュ
+  - ハンズオン環境での動作確認
+
+---
+
 ### 2025-11-13 カテゴリ: Documentation/Refactor
 - 概要: Azure設定情報の集約（.azure/azure_settings.md作成）
 - 詳細:

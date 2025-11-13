@@ -79,14 +79,57 @@ Microsoft Agent FrameworkとAzure OpenAI Service (GPT-5)を使った
 
 ## セットアップ手順
 
-### 1. リポジトリのクローン
+### 🎓 ハンズオン参加者向けクイックスタート
+
+**主催者から配布されたAPI Keyがある場合、こちらの簡単な手順で5分でセットアップ完了！**
+
+1. **リポジトリをクローン**
+   ```bash
+   git clone https://github.com/chinchillaa/agent-handson.git
+   cd agent-handson
+   ```
+
+2. **環境ファイルを作成**
+   ```bash
+   cp .env.example .env
+   nano .env  # または vim/code .env
+   ```
+
+3. **配布されたAPI Keyを.envに設定**
+   ```bash
+   AZURE_OPENAI_ENDPOINT=配布されたエンドポイント
+   AZURE_OPENAI_API_KEY=配布されたAPI_Key
+   AZURE_OPENAI_DEPLOYMENT_GPT5=gpt-5
+   AZURE_OPENAI_DEPLOYMENT_GPT5_MINI=gpt-5-mini
+   ```
+
+4. **依存パッケージをインストール**
+   ```bash
+   uv sync
+   ```
+
+5. **動作確認**
+   ```bash
+   cd 01_multi-llm-reasoning
+   uv run python main.py "量子コンピューターとは？"
+   ```
+
+**詳細**: [ハンズオン参加者向けガイド](../.azure/azure_settings.md#-ハンズオン参加者向けクイックスタート)
+
+---
+
+### 💻 自分のAzureアカウントでセットアップする場合
+
+**本格的に学習したい方・継続利用したい方向けの手順**
+
+#### 1. リポジトリのクローン
 
 ```bash
 git clone https://github.com/chinchillaa/agent-handson.git
 cd agent-handson/01_multi-llm-reasoning
 ```
 
-### 2. 仮想環境のセットアップ
+#### 2. 仮想環境のセットアップ
 
 ```bash
 # uvで依存パッケージを一括インストール（仮想環境も自動作成）
@@ -97,7 +140,7 @@ uv sync
 - `.venv/` ディレクトリに仮想環境を作成
 - `pyproject.toml` と `uv.lock` に基づいて依存パッケージをインストール
 
-### 3. Azure設定
+#### 3. Azure設定
 
 Azure OpenAI Serviceの設定が必要です。
 

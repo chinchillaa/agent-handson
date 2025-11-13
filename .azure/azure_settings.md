@@ -4,11 +4,183 @@
 
 ## 📋 目次
 
+- [🎓 ハンズオン参加者向けクイックスタート](#-ハンズオン参加者向けクイックスタート)
 - [共通設定](#共通設定)
 - [01_multi-llm-reasoning用 Azure設定](#01_multi-llm-reasoning用-azure設定)
 - [02_azure-voice-chatbot用 Azure設定](#02_azure-voice-chatbot用-azure設定)
 - [コスト管理](#コスト管理)
 - [トラブルシューティング](#トラブルシューティング)
+- [主催者向けリソース準備ガイド](#主催者向けリソース準備ガイド)
+
+---
+
+## 🎓 ハンズオン参加者向けクイックスタート
+
+**このセクションはハンズオン参加者向けです。主催者から提供されたAPI Keyを使って、5分でセットアップを完了できます。**
+
+### 前提条件
+
+- ✅ Python 3.11以上がインストール済み
+- ✅ uvパッケージマネージャーがインストール済み（[インストール方法](https://github.com/astral-sh/uv)）
+- ✅ 主催者から配布されたAPI Keyを受領済み
+
+**重要**: Azureアカウントの作成やAzure CLIのインストールは**不要**です！
+
+---
+
+### ⚡ 5分セットアップ手順
+
+#### ステップ1: リポジトリをクローン（1分）
+
+```bash
+git clone https://github.com/chinchillaa/agent-handson.git
+cd agent-handson
+```
+
+#### ステップ2: 環境ファイルを作成（1分）
+
+```bash
+# .env.exampleをコピーして.envを作成
+cp .env.example .env
+```
+
+#### ステップ3: API Keyを設定（2分）
+
+`.env`ファイルをエディタで開き、主催者から配布された値を設定：
+
+```bash
+# エディタで開く（お好みのエディタを使用）
+nano .env
+# または
+vim .env
+# または
+code .env  # VS Code
+```
+
+**設定内容**（配布された値に置き換えてください）:
+
+```bash
+# ========================================
+# Azure OpenAI Service 設定
+# ========================================
+AZURE_OPENAI_ENDPOINT=https://ハンズオン用エンドポイント/
+AZURE_OPENAI_API_KEY=配布されたOpenAI_API_Key
+AZURE_OPENAI_DEPLOYMENT_GPT5=gpt-5
+AZURE_OPENAI_DEPLOYMENT_GPT5_MINI=gpt-5-mini
+
+# ========================================
+# Azure Speech Service 設定
+# ========================================
+AZURE_SPEECH_API_KEY=配布されたSpeech_API_Key
+AZURE_SPEECH_REGION=japaneast
+AZURE_SPEECH_LANGUAGE=ja-JP
+AZURE_SPEECH_VOICE_NAME=ja-JP-NanamiNeural
+```
+
+#### ステップ4: 依存パッケージをインストール（1分）
+
+```bash
+# uvで一括インストール
+uv sync
+```
+
+#### ステップ5: 動作確認（30秒）
+
+**01_multi-llm-reasoningの動作確認**:
+
+```bash
+cd 01_multi-llm-reasoning
+uv run python main.py "量子コンピューターとは何ですか？"
+```
+
+**02_azure-voice-chatbotの動作確認**:
+
+```bash
+cd ../02_azure-voice-chatbot
+uv run python main.py
+# 音声入力が始まったら「こんにちは」と話しかけてみてください
+```
+
+---
+
+### 🔐 セキュリティ注意事項
+
+#### API Keyの取り扱い
+
+⚠️ **重要**: 配布されたAPI Keyは機密情報です！
+
+- ❌ GitHub等の公開リポジトリにpushしない
+- ❌ SNSやチャットで共有しない
+- ❌ スクリーンショットに含めない
+- ✅ ハンズオン終了後は`.env`ファイルを削除
+
+#### .gitignoreの確認
+
+このリポジトリには既に`.gitignore`が設定されており、`.env`ファイルは自動的にGit管理から除外されます。
+
+```bash
+# .gitignoreで除外されているか確認
+cat .gitignore | grep .env
+# 出力: .env が含まれていればOK
+```
+
+---
+
+### ❓ トラブルシューティング（ハンズオン参加者向け）
+
+#### Q1: 環境変数エラーが出る
+
+```
+❌ エラー: AZURE_OPENAI_ENDPOINTが設定されていません
+```
+
+**解決方法**:
+1. `.env`ファイルが`agent-handson/`ディレクトリにあるか確認
+2. API Keyが正しく記載されているか確認（スペースや改行に注意）
+
+```bash
+# 現在のディレクトリを確認
+pwd
+# 出力: /path/to/agent-handson
+
+# .envファイルの存在確認
+ls -la .env
+
+# .envファイルの内容確認（API Keyは表示されます）
+cat .env
+```
+
+#### Q2: Python/uvが見つからない
+
+```
+❌ command not found: python
+❌ command not found: uv
+```
+
+**解決方法**: 主催者または近くの参加者にサポートを依頼してください。
+
+#### Q3: マイクが認識されない（02_azure-voice-chatbot）
+
+**解決方法**:
+- マイクが接続されているか確認
+- ブラウザ/OSのマイク権限を確認
+- 他のアプリがマイクを使用していないか確認
+
+#### その他のトラブル
+
+主催者に質問してください。詳細なエラーメッセージをコピーしておくとスムーズです。
+
+---
+
+### 📚 参考: 本格的な学習をしたい方へ
+
+ハンズオン終了後、自分のAzureアカウントで継続学習したい場合：
+
+1. **Azureアカウントを作成**: https://azure.microsoft.com/free/
+2. **Azure CLIをインストール**: [共通設定](#共通設定)を参照
+3. **自分のリソースを作成**: [01用設定](#01_multi-llm-reasoning用-azure設定)、[02用設定](#02_azure-voice-chatbot用-azure設定)を参照
+
+Azure CLI認証を使えば、APIキーなしで安全に開発できます。
 
 ---
 
@@ -312,8 +484,8 @@ uv run python examples/advanced_chat.py
 
 **GPT-5モデル**:
 - 料金体系: トークンベース課金
-- 入力トークン: 約 $X / 1Mトークン（※最新料金はAzure Portalで確認）
-- 出力トークン: 約 $Y / 1Mトークン
+- 入力トークン: 約 ¥189.91 / 1Mトークン（※最新料金はAzure Portalで確認）
+- 出力トークン: 約 ¥1,519.25 / 1Mトークン
 
 **GPT-5-miniモデル**:
 - 料金体系: トークンベース課金
@@ -485,6 +657,266 @@ cat .env | grep AZURE_SPEECH
 - 音声名が正しいか確認（`ja-JP-NanamiNeural`など）
 - リージョンが音声に対応しているか確認
 - API制限に達していないか確認
+
+---
+
+## 主催者向けリソース準備ガイド
+
+**このセクションはハンズオン主催者向けです。参加者に提供する共有Azureリソースの準備方法を説明します。**
+
+### 📝 準備の流れ
+
+```
+1. Azureリソースの作成
+   ↓
+2. API Keyの取得
+   ↓
+3. 参加者への配布準備
+   ↓
+4. ハンズオン実施
+   ↓
+5. 後処理（API Key無効化）
+```
+
+---
+
+### ステップ1: Azureリソースの作成
+
+#### 1-1. Azure OpenAI Serviceの作成
+
+**リソース作成**:
+- [01_multi-llm-reasoning用 Azure設定](#01_multi-llm-reasoning用-azure設定)の手順に従ってリソース作成
+- GPT-5とGPT-5-miniの両方をデプロイ
+
+**推奨設定**:
+- **価格レベル**: Standard S0（本格利用の場合）
+- **リージョン**: Japan East（日本で実施する場合）
+- **使用量制限**: Azure Portalで設定可能（コスト管理）
+
+#### 1-2. Azure Speech Serviceの作成
+
+**リソース作成**:
+- [02_azure-voice-chatbot用 Azure設定](#02_azure-voice-chatbot用-azure設定)の手順に従ってリソース作成
+
+**推奨設定**:
+- **価格レベル**: Standard S0（Free F0は制限が厳しい）
+- **リージョン**: Japan East（OpenAIと同じリージョン推奨）
+
+---
+
+### ステップ2: API Keyとエンドポイントの取得
+
+#### 2-1. Azure OpenAI Service
+
+Azure Portalで以下を取得：
+
+```
+リソース → キーとエンドポイント
+
+必要な情報:
+- エンドポイント: https://your-resource.openai.azure.com/
+- キー1（API Key）: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+- デプロイメント名: gpt-5, gpt-5-mini
+```
+
+#### 2-2. Azure Speech Service
+
+Azure Portalで以下を取得：
+
+```
+リソース → キーとエンドポイント
+
+必要な情報:
+- キー1（API Key）: yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+- リージョン: japaneast
+```
+
+---
+
+### ステップ3: 参加者への配布資料準備
+
+#### 3-1. .env設定サンプルの作成
+
+参加者に配布する`.env`設定値を準備：
+
+```bash
+# ========================================
+# ハンズオン用Azure設定（参加者配布用）
+# ========================================
+
+# Azure OpenAI Service
+AZURE_OPENAI_ENDPOINT=https://your-actual-endpoint.openai.azure.com/
+AZURE_OPENAI_API_KEY=実際のOpenAI_API_Key
+AZURE_OPENAI_DEPLOYMENT_GPT5=gpt-5
+AZURE_OPENAI_DEPLOYMENT_GPT5_MINI=gpt-5-mini
+
+# Azure Speech Service
+AZURE_SPEECH_API_KEY=実際のSpeech_API_Key
+AZURE_SPEECH_REGION=japaneast
+AZURE_SPEECH_LANGUAGE=ja-JP
+AZURE_SPEECH_VOICE_NAME=ja-JP-NanamiNeural
+```
+
+#### 3-2. 配布方法
+
+**推奨**: ハンズオン当日にSlack/チャットで共有
+
+```markdown
+# ハンズオン参加者の皆様へ
+
+以下の設定値を.envファイルに記載してください：
+
+（上記の設定値をコピー）
+
+⚠️ 注意:
+- このAPI Keyはハンズオン専用です
+- ハンズオン終了後、このKeyは無効化されます
+- 外部への共有は厳禁です
+```
+
+**セキュリティのベストプラクティス**:
+- ✅ 当日配布（事前配布は避ける）
+- ✅ Slack DM、限定チャンネルで共有
+- ✅ 公開チャンネル・メールは避ける
+- ✅ ハンズオン終了後に無効化を明記
+
+---
+
+### ステップ4: コスト管理
+
+#### 4-1. 使用量制限の設定（推奨）
+
+Azure Portalで使用量制限を設定：
+
+```
+Azure OpenAI Service
+→ クォータ
+→ 使用量制限を設定
+
+例: 1日あたり100,000トークンまで
+```
+
+#### 4-2. 予算アラートの設定
+
+Azure Cost Managementで予算を設定：
+
+```
+Cost Management
+→ 予算
+→ 新しい予算を作成
+
+例: 月5,000円の予算、80%で警告
+```
+
+#### 4-3. 想定コスト（参考）
+
+**10人規模のハンズオン（3時間）の場合**:
+
+| サービス | 使用量 | 単価 | 合計 |
+|---------|--------|------|------|
+| Azure OpenAI (GPT-5) | ~500K tokens | ~$X/1M tokens | ~$Y |
+| Azure OpenAI (GPT-5-mini) | ~1M tokens | ~$Z/1M tokens | ~$W |
+| Azure Speech (STT) | ~5時間 | ~¥120/時間 | ~¥600 |
+| Azure Speech (TTS) | ~100K文字 | ~¥2,000/1M文字 | ~¥200 |
+| **合計** | - | - | **~¥1,000〜3,000** |
+
+*実際の料金は使用状況により変動します。最新料金はAzure Portalで確認してください。
+
+---
+
+### ステップ5: ハンズオン当日の運営
+
+#### 5-1. 開始前
+
+- [ ] API Keyが有効であることを確認
+- [ ] 自分の環境で動作確認
+- [ ] Slackに配布資料を投稿準備
+
+#### 5-2. ハンズオン中
+
+- [ ] API Key使用状況をモニタリング（Azure Portal）
+- [ ] 使用量が予想を超えた場合は制限を調整
+- [ ] トラブル時は[トラブルシューティング](#トラブルシューティング)を参照
+
+#### 5-3. よくある質問への対応
+
+**Q: API Keyが認識されない**
+→ `.env`ファイルの場所、スペース・改行の確認
+
+**Q: マイクが動かない**
+→ OSのマイク権限設定を確認
+
+**Q: 応答が遅い**
+→ Azure リージョンの距離、ネットワーク状況を確認
+
+---
+
+### ステップ6: ハンズオン終了後の処理
+
+#### 6-1. API Keyの無効化（必須）
+
+**Azure OpenAI Service**:
+```
+Azure Portal
+→ Azure OpenAI リソース
+→ キーとエンドポイント
+→ キー1を再生成
+
+これにより配布したAPI Keyは即座に無効化されます
+```
+
+**Azure Speech Service**:
+```
+同様の手順でSpeech ServiceのAPI Keyも再生成
+```
+
+#### 6-2. 使用量・コストの確認
+
+```
+Cost Management
+→ コスト分析
+→ 期間を選択してコストを確認
+```
+
+#### 6-3. 参加者へのフォローアップ（オプション）
+
+```markdown
+# ハンズオンご参加ありがとうございました
+
+本日使用したAPI Keyは無効化されました。
+継続学習したい方は、以下を参照してご自身のAzureアカウントでお試しください：
+
+📚 .azure/azure_settings.md
+- 「共通設定」セクション
+- 「01_multi-llm-reasoning用 Azure設定」
+- 「02_azure-voice-chatbot用 Azure設定」
+
+ご質問があればお気軽にどうぞ！
+```
+
+---
+
+### 📊 チェックリスト
+
+#### ハンズオン1週間前
+
+- [ ] Azureリソース作成完了
+- [ ] API Key取得完了
+- [ ] 配布資料準備完了
+- [ ] 自分の環境で動作確認完了
+- [ ] 使用量制限・予算アラート設定完了
+
+#### ハンズオン当日
+
+- [ ] API Key配布準備完了
+- [ ] モニタリング画面を開いておく
+- [ ] トラブルシューティング資料を手元に用意
+
+#### ハンズオン終了後
+
+- [ ] API Key無効化完了
+- [ ] 使用量・コスト確認完了
+- [ ] 参加者フォローアップ送信（オプション）
 
 ---
 
