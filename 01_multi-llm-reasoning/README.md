@@ -97,55 +97,12 @@ uv sync
 - `.venv/` ディレクトリに仮想環境を作成
 - `pyproject.toml` と `uv.lock` に基づいて依存パッケージをインストール
 
-### 3. 環境変数の設定
+### 3. Azure設定
 
-```bash
-# .env.exampleをコピー
-cd ..  # プロジェクトルート (agent-handson/) へ
-cp .env.example .env
+Azure OpenAI Serviceの設定が必要です。
 
-# .envファイルを編集
-nano .env  # または vim .env
-```
-
-#### .envファイルの設定項目
-
-```bash
-# ========================================
-# 必須設定
-# ========================================
-
-# Azure OpenAI Serviceのエンドポイント
-AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
-
-# デプロイメント名（Azure Portalで設定した名前）
-AZURE_OPENAI_DEPLOYMENT_GPT5=gpt-5
-AZURE_OPENAI_DEPLOYMENT_GPT5_MINI=gpt-5-mini
-
-# ========================================
-# 認証方式（以下のいずれか）
-# ========================================
-
-# 【方式1】Azure CLI認証（推奨）
-# 以下のコマンドを実行後、API Keyの設定は不要
-# $ az login
-
-# 【方式2】API Key認証
-# Azure Portal から取得したAPI Keyを設定
-# AZURE_OPENAI_API_KEY=your_api_key_here
-```
-
-詳細は `.env.example` のコメントを参照してください。
-
-### 4. Azure認証（Azure CLI使用の場合）
-
-```bash
-# Azureにログイン
-az login
-
-# サブスクリプションの確認
-az account show
-```
+**詳細な設定手順は以下を参照してください**:
+- **[Azure設定ガイド](../.azure/azure_settings.md)** - Azure OpenAI Serviceの作成手順、モデルデプロイメント、環境変数設定、認証方法など
 
 ## 使用方法
 
@@ -315,55 +272,7 @@ uv run python examples/complex_reasoning.py
 
 ## トラブルシューティング
 
-### 環境変数エラー
-
-```
-❌ エラー: AZURE_OPENAI_ENDPOINTが設定されていません
-```
-
-**解決方法**: `.env` ファイルが正しく設定されているか確認してください。
-
-```bash
-# .envファイルの確認
-cat ../.env
-
-# 設定例
-AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
-```
-
-### 認証エラー
-
-```
-❌ Azure認証エラー
-```
-
-**解決方法**:
-
-**Azure CLI認証の場合**:
-```bash
-az login
-az account show  # サブスクリプションを確認
-```
-
-**API Key認証の場合**:
-```bash
-# .envファイルにAPI Keyを追加
-AZURE_OPENAI_API_KEY=your_api_key_here
-```
-
-### モデルが見つからないエラー
-
-```
-❌ Deployment not found
-```
-
-**解決方法**: Azure Portal でモデルのデプロイメント名を確認し、`.env` ファイルの設定と一致させてください。
-
-```bash
-# デプロイメント名を確認
-AZURE_OPENAI_DEPLOYMENT_GPT5=実際のデプロイメント名
-AZURE_OPENAI_DEPLOYMENT_GPT5_MINI=実際のデプロイメント名
-```
+Azure関連のトラブルシューティングは **[Azure設定ガイド - トラブルシューティング](../.azure/azure_settings.md#トラブルシューティング)** を参照してください。
 
 ### パッケージインストールエラー
 

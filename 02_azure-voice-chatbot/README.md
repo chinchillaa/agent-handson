@@ -102,79 +102,12 @@ uv sync
 - `azure-identity`
 - `python-dotenv`
 
-### 3. Azure Speech Serviceのリソース作成
+### 3. Azure設定
 
-#### ステップ3-1: Azure Portalにアクセス
+Azure Speech ServiceとAzure OpenAI Serviceの設定が必要です。
 
-https://portal.azure.com にアクセスしてログイン
-
-#### ステップ3-2: Speech Serviceを作成
-
-1. **「リソースの作成」** をクリック
-2. **「AI + Machine Learning」** → **「Speech Services」** を選択
-3. **設定項目を入力**:
-   - **サブスクリプション**: 使用するサブスクリプション
-   - **リソースグループ**: 新規作成（例: `voice-chatbot-rg`）
-   - **リージョン**: `Japan East`（推奨）または `East US`
-   - **名前**: 任意の名前（例: `voice-chatbot-speech`）
-   - **価格レベル**:
-     - テスト用: `Free F0`（月5時間まで無料）
-     - 本格利用: `Standard S0`
-4. **「確認および作成」** → **「作成」** をクリック
-
-#### ステップ3-3: APIキーとリージョンを取得
-
-1. 作成したSpeech Serviceリソースを開く
-2. 左メニューから **「キーとエンドポイント」** を選択
-3. 以下の情報をコピー:
-   - **キー1** (API Key)
-   - **リージョン** (例: `japaneast`)
-
-### 4. 環境変数の設定
-
-```bash
-# プロジェクトルート（agent-handson/）の .env ファイルを編集
-cd ..  # agent-handson/ へ
-nano .env  # または vim .env
-```
-
-#### .envファイルに以下を追加
-
-```bash
-# ========================================
-# Azure Speech Service 設定
-# ========================================
-
-# Speech Service 認証情報
-AZURE_SPEECH_API_KEY=your_speech_api_key_here
-AZURE_SPEECH_REGION=japaneast
-
-# 音声設定
-AZURE_SPEECH_LANGUAGE=ja-JP
-AZURE_SPEECH_VOICE_NAME=ja-JP-NanamiNeural
-
-# ========================================
-# Azure OpenAI Service 設定（既存）
-# ========================================
-# AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
-# AZURE_OPENAI_DEPLOYMENT_GPT5=gpt-5
-# （Azure CLI認証の場合、API Keyは不要）
-```
-
-**利用可能な日本語音声**:
-- `ja-JP-NanamiNeural` (女性・標準的)
-- `ja-JP-KeitaNeural` (男性・落ち着いた)
-- `ja-JP-AoiNeural` (女性・若々しい)
-
-### 5. Azure認証（Azure CLI使用の場合）
-
-```bash
-# Azureにログイン（OpenAI用）
-az login
-
-# サブスクリプションの確認
-az account show
-```
+**詳細な設定手順は以下を参照してください**:
+- **[Azure設定ガイド](../.azure/azure_settings.md)** - Azure Speech Service・Azure OpenAI Serviceの作成手順、環境変数設定、認証方法など
 
 ## 使用方法
 
@@ -264,19 +197,7 @@ uv run python 02_azure-voice-chatbot/examples/test_speech.py
 
 ## トラブルシューティング
 
-### Speech Service認証エラー
-
-```
-❌ エラー: Speech Service認証に失敗しました
-```
-
-**解決方法**:
-```bash
-# .envファイルを確認
-cat ../.env | grep AZURE_SPEECH
-
-# API KeyとリージョンがAzure Portalの値と一致しているか確認
-```
+Azure関連のトラブルシューティングは **[Azure設定ガイド - トラブルシューティング](../.azure/azure_settings.md#トラブルシューティング)** を参照してください。
 
 ### マイクが認識されない
 

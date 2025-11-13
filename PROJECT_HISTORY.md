@@ -26,6 +26,39 @@
 
 ---
 
+### 2025-11-13 カテゴリ: Documentation/Refactor
+- 概要: Azure設定情報の集約（.azure/azure_settings.md作成）
+- 詳細:
+  - **Azure設定ガイドの作成** (.azure/azure_settings.md)
+    - 01_multi-llm-reasoningと02_azure-voice-chatbotのAzure設定を一元管理
+    - 共通設定セクション: Azure CLIインストール、認証、サブスクリプション設定
+    - 01用設定: Azure OpenAI Service作成、GPT-5/GPT-5-miniデプロイメント
+    - 02用設定: Azure Speech Service作成、音声プロファイル一覧
+    - コスト管理: 料金体系、Free Tier活用方法
+    - トラブルシューティング: 環境変数エラー、認証エラー、モデルエラーなど
+  - **各プロジェクトREADMEの更新**
+    - 01_multi-llm-reasoning/README.md: Azure設定セクションを.azure/azure_settings.mdへの参照に変更
+    - 02_azure-voice-chatbot/README.md: 同様に.azure/azure_settings.mdへの参照に変更
+    - トラブルシューティングセクションもAzure関連は外部参照に統一
+  - **情報の重複排除**
+    - Azure Speech Serviceリソース作成手順を削除（azure_settings.mdに集約）
+    - 環境変数設定例を削除（azure_settings.mdに集約）
+    - Azure認証手順を削除（azure_settings.mdに集約）
+- 関連ファイル:
+  - .azure/azure_settings.md（作成・517行）
+  - 01_multi-llm-reasoning/README.md（更新）
+  - 02_azure-voice-chatbot/README.md（更新）
+- コミット/PR: (次のステップ)
+- 作成者: Claude Code
+- 承認: y（ユーザー）
+- メモ:
+  - Phase 4移行前の準備として、Azure設定情報を整理
+  - 今後のメンテナンス性向上（Azure設定は1ファイルで管理）
+  - 各プロジェクトのREADMEがすっきりし、プロジェクト固有の情報に集中
+- 次アクション:
+  - 変更のコミット
+  - Phase 4（テストとドキュメント整備）への移行
+
 ### 2025-11-13 カテゴリ: Feature/Implementation
 - 概要: 02_azure-voice-chatbot Phase 3 完全実装（音声コマンド機能統合）
 - 詳細:
