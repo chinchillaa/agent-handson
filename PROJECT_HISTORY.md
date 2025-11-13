@@ -26,6 +26,47 @@
 
 ---
 
+### 2025-11-13 カテゴリ: Feature/Implementation
+- 概要: 02_azure-voice-chatbot Phase 3 完全実装（音声コマンド機能統合）
+- 詳細:
+  - **VoiceChatクラス拡張** (voice_chat.py)
+    - ContextManager と ConversationSummarizer を統合
+    - 各ターン終了時に自動的にコンテキスト抽出
+    - 現在の音声プロファイルと話速を保持
+  - **音声コマンド処理機能**
+    - `_is_voice_command()`: 音声コマンド検出（要約、音声変更、話速調整、リセット）
+    - `_handle_voice_command()`: コマンド処理のルーティング
+    - `_generate_summary()`: 会話要約の生成
+    - `_change_voice_profile()`: 音声プロファイルの動的切り替え（5種類を循環）
+    - `_change_speaking_rate()`: 話速調整（±0.25倍速、0.5x～1.5xの範囲）
+    - `_reset_voice_settings()`: 音声設定のリセット
+  - **対話ループへの統合**
+    - ユーザー入力後、音声コマンドを優先チェック
+    - コマンド検出時はエージェント呼び出しをスキップしてコマンド処理
+    - 話速変更時は `speak_with_options()` を使用して動的に適用
+  - **高度なサンプル作成** (examples/advanced_chat.py)
+    - Phase 3機能の完全デモ
+    - 利用可能なコマンド一覧表示
+    - デモシナリオ提示
+    - 対話終了後にコンテキスト管理・会話要約のデモ表示
+  - **ドキュメント更新**
+    - README.md: Phase 3機能の説明追加、音声コマンド一覧を記載
+    - 特徴セクションに Phase 3 機能を明記
+- 関連ファイル:
+  - 02_azure-voice-chatbot/voice_chat.py（拡張）
+  - 02_azure-voice-chatbot/examples/advanced_chat.py（作成）
+  - 02_azure-voice-chatbot/README.md（更新）
+- コミット/PR: (未実施)
+- 作成者: Claude Code
+- 承認: y（ユーザー）
+- メモ:
+  - Phase 3の実装により、音声対話システムが実用的なレベルに到達
+  - 音声コマンドで要約・音声変更・話速調整が可能
+  - コンテキスト管理により会話の文脈を自動保持
+- 次アクション:
+  - Phase 4（テストとドキュメント整備）への移行検討
+  - 実環境でのテスト実施
+
 ### 2025-11-12 カテゴリ: Feature/Implementation
 - 概要: 02_azure-voice-chatbot Phase 3 実装完了（機能拡張・会話支援ツール）
 - 詳細:

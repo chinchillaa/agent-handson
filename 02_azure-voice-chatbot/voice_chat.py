@@ -3,6 +3,12 @@
 
 Speech-to-Text、エージェント、Text-to-Speechを統合した音声対話システムです。
 無限ループ防止のための安全機構を実装しています。
+
+Phase 3拡張:
+- コンテキスト管理
+- 会話要約機能
+- 音声プロファイル動的切り替え
+- 音声コマンド処理
 """
 
 import time
@@ -11,6 +17,14 @@ from speech.recognizer import SpeechRecognizer
 from speech.synthesizer import SpeechSynthesizer
 from agents.voice_agent import VoiceAgentSession
 from config.settings import settings
+from tools.context_manager import ContextManager
+from tools.conversation_summarizer import ConversationSummarizer
+from config.voice_profiles import (
+    get_voice_profile,
+    list_available_profiles,
+    SPEAKING_RATES,
+    CUSTOM_PROFILES
+)
 
 
 class VoiceChat:
@@ -43,6 +57,14 @@ class VoiceChat:
         self.turn_count = 0
         self.consecutive_errors = 0
         self.session_start_time = None
+
+        # Phase 3: 会話支援ツール
+        self.context_manager = ContextManager()
+        self.summarizer = ConversationSummarizer()
+
+        # Phase 3: 音声設定
+        self.current_voice_profile = "default"
+        self.current_speaking_rate = 1.0
 
     def _check_safety_limits(self) -> tuple[bool, Optional[str]]:
         """
@@ -81,6 +103,141 @@ class VoiceChat:
             終了コマンドの場合True
         """
         return settings.is_exit_keyword(text)
+
+    def _is_voice_command(self, text: str) -> tuple[bool, Optional[str]]:
+        """
+        音声コマンドかどうかを判定（Phase 3）
+
+        Args:
+            text: ユーザー入力テキスト
+
+        Returns:
+            (コマンドフラグ, コマンドタイプ)のタプル
+            コマンドタイプ: "summary", "voice_change", "speed_up", "speed_down", "reset_voice"
+        """
+        text_lower = text.lower()
+
+        # 会話要約コマンド
+        if any(kw in text for kw in ["要約", "まとめ", "サマリー"]):
+            return True, "summary"
+
+        # 音声プロファイル変更コマンド
+        if any(kw in text for kw in ["音声", "声"]) and any(kw in text for kw in ["変更", "変えて", "切り替え"]):
+            return True, "voice_change"
+
+        # 話速変更コマンド
+        if any(kw in text for kw in ["速く", "早く", "スピードアップ"]):
+            return True, "speed_up"
+        if any(kw in text for kw in ["ゆっくり", "遅く", "スピードダウン"]):
+            return True, "speed_down"
+
+        # 音声設定リセット
+        if any(kw in text for kw in ["リセット", "初期化", "デフォルト"]) and "音声" in text:
+            return True, "reset_voice"
+
+        return False, None
+
+    async def _handle_voice_command(self, command_type: str) -> str:
+        """
+        音声コマンドを処理（Phase 3）
+
+        Args:
+            command_type: コマンドタイプ
+
+        Returns:
+            応答メッセージ
+        """
+        if command_type == "summary":
+            return self._generate_summary()
+
+        elif command_type == "voice_change":
+            return self._change_voice_profile()
+
+        elif command_type == "speed_up":
+            return self._change_speaking_rate(faster=True)
+
+        elif command_type == "speed_down":
+            return self._change_speaking_rate(faster=False)
+
+        elif command_type == "reset_voice":
+            return self._reset_voice_settings()
+
+        return "コマンドを認識できませんでした。"
+
+    def _generate_summary(self) -> str:
+        """
+        会話要約を生成（Phase 3）
+
+        Returns:
+            要約テキスト
+        """
+        history = self.session.get_conversation_history()
+        if not history:
+            return "まだ会話履歴がありません。"
+
+        summary = self.summarizer.summarize_conversation(history)
+        return f"会話の要約です。{summary}"
+
+    def _change_voice_profile(self) -> str:
+        """
+        音声プロファイルを変更（Phase 3）
+
+        Returns:
+            応答メッセージ
+        """
+        # 利用可能なプロファイルをリスト
+        available_profiles = ["default", "gentle", "energetic", "calm_male", "friendly_male"]
+
+        # 現在のプロファイルから次のプロファイルへ切り替え
+        current_index = available_profiles.index(self.current_voice_profile) if self.current_voice_profile in available_profiles else 0
+        next_index = (current_index + 1) % len(available_profiles)
+        new_profile_name = available_profiles[next_index]
+
+        # プロファイルを取得して適用
+        profile = get_voice_profile(new_profile_name)
+        if profile:
+            self.synthesizer.set_voice(profile.voice_name)
+            self.current_voice_profile = new_profile_name
+            self.current_speaking_rate = profile.speaking_rate
+
+            return f"音声を{profile.name}に変更しました。{profile.description}"
+
+        return "音声プロファイルの変更に失敗しました。"
+
+    def _change_speaking_rate(self, faster: bool = True) -> str:
+        """
+        話速を変更（Phase 3）
+
+        Args:
+            faster: True=速くする、False=遅くする
+
+        Returns:
+            応答メッセージ
+        """
+        if faster:
+            self.current_speaking_rate = min(1.5, self.current_speaking_rate + 0.25)
+            message = f"話速を速くしました。現在は{self.current_speaking_rate}倍速です。"
+        else:
+            self.current_speaking_rate = max(0.5, self.current_speaking_rate - 0.25)
+            message = f"話速を遅くしました。現在は{self.current_speaking_rate}倍速です。"
+
+        return message
+
+    def _reset_voice_settings(self) -> str:
+        """
+        音声設定をリセット（Phase 3）
+
+        Returns:
+            応答メッセージ
+        """
+        self.current_voice_profile = "default"
+        self.current_speaking_rate = 1.0
+
+        profile = get_voice_profile("default")
+        if profile:
+            self.synthesizer.set_voice(profile.voice_name)
+
+        return "音声設定をデフォルトにリセットしました。"
 
     async def start_conversation(self):
         """
@@ -163,13 +320,28 @@ class VoiceChat:
                     self.synthesizer.speak(farewell_message)
                     break
 
-                # 2. エージェント処理
-                print("🤔 応答を生成中...")
-                assistant_response = await self.session.send_message(user_text)
-                print(f"🤖 アシスタント: {assistant_response}")
+                # Phase 3: 音声コマンドチェック
+                is_command, command_type = self._is_voice_command(user_text)
+                if is_command:
+                    print(f"🎛️  音声コマンドを検出: {command_type}")
+                    assistant_response = await self._handle_voice_command(command_type)
+                    print(f"🤖 アシスタント: {assistant_response}")
+                else:
+                    # 2. エージェント処理
+                    print("🤔 応答を生成中...")
+                    assistant_response = await self.session.send_message(user_text)
+                    print(f"🤖 アシスタント: {assistant_response}")
 
-                # 3. 音声合成
-                success, result = self.synthesizer.speak(assistant_response)
+                # 3. 音声合成（話速を適用）
+                if self.current_speaking_rate != 1.0:
+                    # 話速が変更されている場合はspeak_with_optionsを使用
+                    success, result = self.synthesizer.speak_with_options(
+                        assistant_response,
+                        rate=self.current_speaking_rate
+                    )
+                else:
+                    # デフォルトの話速の場合は通常のspeakを使用
+                    success, result = self.synthesizer.speak(assistant_response)
 
                 if not success:
                     print(f"⚠️  音声合成エラー: {result}")
@@ -177,6 +349,11 @@ class VoiceChat:
 
                 # ターン数をインクリメント
                 self.turn_count += 1
+
+                # Phase 3: コンテキストを自動抽出
+                self.context_manager.extract_from_conversation(
+                    self.session.get_conversation_history()
+                )
 
             except KeyboardInterrupt:
                 print("\n\n⏹  ユーザーによって中断されました")
