@@ -99,7 +99,7 @@ uv run python main.py
 
 ⚠️ **重要**: 配布されたAPI Keyは機密情報です！
 
-- ❌ GitHub等にpushしない
+- ❌ GitHubにpushしない
 - ❌ SNSで共有しない
 - ❌ スクリーンショットに含めない
 - ✅ ハンズオン終了後は`.env`ファイルを削除
