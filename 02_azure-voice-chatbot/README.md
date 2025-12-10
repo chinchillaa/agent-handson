@@ -35,7 +35,7 @@ Azure Speech ServicesとMicrosoft Agent Frameworkを組み合わせた**音声�
 - [環境要件](#環境要件)
 - [セットアップ手順](#セットアップ手順)
 - [使用方法](#使用方法)
-- [Phase 3: 音声コマンド機能](#phase-3-音声コマンド機能)
+- [音声コマンド機能](#音声コマンド機能)
 - [プロジェクト構造](#プロジェクト構造)
 - [トラブルシューティング](#トラブルシューティング)
 - [実用例とユースケース](#実用例とユースケース)
@@ -49,18 +49,22 @@ Azure Speech ServicesとMicrosoft Agent Frameworkを組み合わせた**音声�
 
 ### 特徴
 
-#### ✅ Phase 1-2: 基本機能（完了）
+#### ✅ 基本機能
 - **Speech-to-Text**: 日本語音声をリアルタイムでテキスト化
 - **GPT-5との対話**: マルチターン会話に対応
 - **Text-to-Speech**: 自然な日本語音声で応答
 - **安全機構**: 無限ループ防止、エラーハンドリング
 
-#### ✅ Phase 3: 高度な機能（完了）
-- **音声コマンド**: 「要約して」「音声を変更して」などの音声操作
-- **コンテキスト管理**: 会話の文脈を自動抽出・保持
-- **会話要約**: これまでの対話を自動要約
-- **音声プロファイル切り替え**: 5種類の音声から選択可能
-- **話速調整**: リアルタイムで話速を変更（0.5x ~ 1.5x）
+#### ✅ 音声コマンド機能
+- **会話要約**: 「要約して」「まとめて」でこれまでの対話を自動要約
+- **音声プロファイル切り替え**: 「音声を変更して」で5種類の音声から選択可能
+- **話速調整**: 「速く話して」「ゆっくり話して」でリアルタイム調整（0.5x ~ 1.5x）
+- **設定リセット**: 「音声をリセット」でデフォルトに戻す
+
+#### ✅ コンテキスト管理
+- **会話の文脈を自動抽出・保持**: ユーザー名、話題などを自動認識
+- **自然な対話**: 前の会話内容を踏まえた応答
+- **統計情報**: 会話ターン数、メッセージ数などを管理
 
 ### 動作イメージ
 
@@ -211,7 +215,7 @@ Azure Speech ServiceとAzure OpenAI Serviceの設定が必要です。
 ### 基本的な使い方
 
 ```bash
-# 音声対話を開始（Phase 2完了）
+# 音声対話を開始
 uv run python 02_azure-voice-chatbot/main.py
 ```
 
@@ -219,23 +223,23 @@ uv run python 02_azure-voice-chatbot/main.py
 
 **終了方法**: 「終了」「バイバイ」「さようなら」などと話しかけるか、Ctrl+C
 
-### 高度な機能デモ（Phase 3完了）
+### 音声コマンド機能を体験
 
 ```bash
-# Phase 3機能を体験（音声コマンド、コンテキスト管理、会話要約）
+# 音声コマンド、コンテキスト管理、会話要約などの高度な機能を試す
 uv run python 02_azure-voice-chatbot/examples/advanced_chat.py
 ```
 
-### 音声入出力のテスト（Phase 1）
+### 音声入出力のテスト
 
 ```bash
-# 音声認識・合成のテスト
+# 音声認識・合成の基本動作を確認
 uv run python 02_azure-voice-chatbot/examples/test_speech.py
 ```
 
 ---
 
-## Phase 3: 音声コマンド機能
+## 音声コマンド機能
 
 音声対話中に以下のコマンドを使用できます：
 
@@ -278,7 +282,7 @@ uv run python 02_azure-voice-chatbot/examples/test_speech.py
 ├── agents/                    # エージェント定義
 │   ├── __init__.py
 │   ├── base.py               # ベースエージェント
-│   └── voice_agent.py        # 音声対話エージェント（Phase 2）
+│   └── voice_agent.py        # 音声対話エージェント
 │
 ├── speech/                    # 音声処理モジュール
 │   ├── __init__.py
@@ -291,17 +295,31 @@ uv run python 02_azure-voice-chatbot/examples/test_speech.py
 │
 ├── tools/                     # カスタムツール
 │   ├── __init__.py
-│   └── conversation_tools.py # 会話支援ツール（Phase 3）
+│   ├── context_manager.py    # コンテキスト管理
+│   ├── conversation_summarizer.py # 会話要約
+│   └── voice_profiles.py     # 音声プロファイル定義
+│
+├── tests/                     # テストコード
+│   ├── __init__.py
+│   ├── test_config.py        # 設定テスト
+│   ├── test_recognizer.py    # 音声認識テスト
+│   ├── test_synthesizer.py   # 音声合成テスト
+│   ├── test_context_manager.py # コンテキスト管理テスト
+│   ├── test_conversation_summarizer.py # 会話要約テスト
+│   ├── test_voice_agent.py   # エージェントテスト
+│   ├── test_voice_chat.py    # 対話ループテスト
+│   └── test_integration.py   # 統合テスト
 │
 ├── examples/                  # 実行サンプル
 │   ├── __init__.py
 │   ├── test_speech.py        # 音声入出力テスト
-│   ├── simple_chat.py        # 基本音声対話（Phase 2）
-│   └── advanced_chat.py      # Phase 3機能デモ
+│   ├── simple_chat.py        # 基本音声対話
+│   └── advanced_chat.py      # 音声コマンド機能デモ
 │
-├── main.py                    # メインエントリーポイント（Phase 2）
-├── voice_chat.py              # 音声対話ループ（Phase 2）
-├── DESIGN.md                  # 設計ドキュメント
+├── main.py                    # メインエントリーポイント
+├── voice_chat.py              # 音声対話ループ
+├── DESIGN.md                  # 設計ドキュメント（開発者向け）
+├── COST_ESTIMATES.md          # コスト見積もり
 └── README.md                  # このファイル
 ```
 
@@ -431,11 +449,12 @@ uv sync --refresh
 
 ## 関連ドキュメント
 
-- **設計ドキュメント**: [DESIGN.md](./DESIGN.md)
+- **コスト見積もり**: [COST_ESTIMATES.md](./COST_ESTIMATES.md)
 - **プロジェクトルート**: [../README.md](../README.md)
 - **ハンズオンクイックスタート**: [../HANDSON_QUICKSTART.md](../HANDSON_QUICKSTART.md)
-- **開発履歴**: [../PROJECT_HISTORY.md](../PROJECT_HISTORY.md)
-- **開発ガイド**: [../CLAUDE.md](../CLAUDE.md)
+- **設計ドキュメント（開発者向け）**: [DESIGN.md](./DESIGN.md)
+- **開発履歴（開発者向け）**: [../PROJECT_HISTORY.md](../PROJECT_HISTORY.md)
+- **開発ガイド（開発者向け）**: [../CLAUDE.md](../CLAUDE.md)
 
 ---
 

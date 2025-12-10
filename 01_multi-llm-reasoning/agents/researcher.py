@@ -5,9 +5,9 @@ Research Agent - リサーチエージェント
 """
 
 from agent_framework._tools import HostedWebSearchTool
-from .base import create_azure_agent
-from ..config.settings import settings
-from ..tools import (
+from agents.base import create_azure_agent
+from config.settings import settings
+from tools import (
     extract_key_information,
     summarize_search_results,
     organize_information,

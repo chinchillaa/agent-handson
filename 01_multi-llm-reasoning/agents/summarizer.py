@@ -4,9 +4,9 @@ Summary Agent - サマリーエージェント
 各エージェントの結果を統合・要約し、最終的な回答を生成します。
 """
 
-from .base import create_azure_agent
-from ..config.settings import settings
-from ..tools import (
+from agents.base import create_azure_agent
+from config.settings import settings
+from tools import (
     format_as_markdown,
     create_bullet_list,
     structure_as_json,

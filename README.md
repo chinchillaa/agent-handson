@@ -56,7 +56,7 @@ uv run python main.py "量子コンピューターとは何ですか？"
 
 ## 📋 プロジェクト概要
 
-### ✅ 01_multi-llm-reasoning（Phase 1-4 完了）
+### ✅ 01_multi-llm-reasoning
 **4つのAIエージェントによる協調推論システム**
 
 複数のAIエージェントが連携して、複雑な質問を分析・調査・統合する本格的なマルチエージェントシステムです。
@@ -81,7 +81,7 @@ uv run python main.py "量子コンピューターとは何ですか？"
 
 ---
 
-### ✅ 02_azure-voice-chatbot（Phase 1-3 完了）
+### ✅ 02_azure-voice-chatbot
 **Azure Speech Servicesで実現する音声対話AIチャットボット**
 
 Azure Speech ServicesとAgent Frameworkを組み合わせた、**音声で対話できる**次世代AIアシスタントです。
@@ -92,7 +92,7 @@ Azure Speech ServicesとAgent Frameworkを組み合わせた、**音声で対話
 - 🔊 **自然な音声合成**: 5種類の日本語Neural Voiceから選択可能
 - 🎙️ **音声コマンド対応**: 「要約して」「音声を変更して」などの直感的な操作
 
-#### 💡 Phase 3 完了機能
+#### 💡 高度な機能
 - 会話コンテキスト管理
 - リアルタイム会話要約
 - 音声プロファイル切り替え（5種類）

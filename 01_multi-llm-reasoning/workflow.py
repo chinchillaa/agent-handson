@@ -10,7 +10,7 @@ import logging
 from typing import Dict, Any, List
 from datetime import datetime
 
-from .agents import (
+from agents import (
     create_coordinator_agent,
     create_researcher_agent,
     create_analyzer_agent,
@@ -88,16 +88,19 @@ class MultiAgentWorkflow:
             # Coordinatorに質問を送信
             response = await self.coordinator.run(user_query)
 
+            # レスポンスからテキストを取得（agent-framework 1.0.0b251209対応）
+            output_text = response.text
+
             # 実行履歴に記録
             self.execution_history.append({
                 "agent": "Coordinator",
                 "timestamp": datetime.now().isoformat(),
                 "input": user_query,
-                "output": response.content
+                "output": output_text
             })
 
-            logger.info(f"✅ Coordinator完了: {len(response.content)}文字の計画を生成")
-            return response.content
+            logger.info(f"✅ Coordinator完了: {len(output_text)}文字の計画を生成")
+            return output_text
 
         except Exception as e:
             logger.error(f"❌ Coordinatorエラー: {e}")
@@ -134,16 +137,19 @@ Web検索ツールを活用し、最新の情報を含めてください。
             # Researcherに送信
             response = await self.researcher.run(researcher_prompt)
 
+            # レスポンスからテキストを取得
+            output_text = response.text
+
             # 実行履歴に記録
             self.execution_history.append({
                 "agent": "Researcher",
                 "timestamp": datetime.now().isoformat(),
                 "input": researcher_prompt,
-                "output": response.content
+                "output": output_text
             })
 
-            logger.info(f"✅ Researcher完了: {len(response.content)}文字の情報を収集")
-            return response.content
+            logger.info(f"✅ Researcher完了: {len(output_text)}文字の情報を収集")
+            return output_text
 
         except Exception as e:
             logger.error(f"❌ Researcherエラー: {e}")
@@ -185,16 +191,19 @@ Web検索ツールを活用し、最新の情報を含めてください。
             # Analyzerに送信
             response = await self.analyzer.run(analyzer_prompt)
 
+            # レスポンスからテキストを取得
+            output_text = response.text
+
             # 実行履歴に記録
             self.execution_history.append({
                 "agent": "Analyzer",
                 "timestamp": datetime.now().isoformat(),
                 "input": analyzer_prompt,
-                "output": response.content
+                "output": output_text
             })
 
-            logger.info(f"✅ Analyzer完了: {len(response.content)}文字の分析を生成")
-            return response.content
+            logger.info(f"✅ Analyzer完了: {len(output_text)}文字の分析を生成")
+            return output_text
 
         except Exception as e:
             logger.error(f"❌ Analyzerエラー: {e}")
@@ -246,16 +255,19 @@ Web検索ツールを活用し、最新の情報を含めてください。
             # Summarizerに送信
             response = await self.summarizer.run(summarizer_prompt)
 
+            # レスポンスからテキストを取得
+            output_text = response.text
+
             # 実行履歴に記録
             self.execution_history.append({
                 "agent": "Summarizer",
                 "timestamp": datetime.now().isoformat(),
                 "input": summarizer_prompt,
-                "output": response.content
+                "output": output_text
             })
 
-            logger.info(f"✅ Summarizer完了: {len(response.content)}文字の最終回答を生成")
-            return response.content
+            logger.info(f"✅ Summarizer完了: {len(output_text)}文字の最終回答を生成")
+            return output_text
 
         except Exception as e:
             logger.error(f"❌ Summarizerエラー: {e}")

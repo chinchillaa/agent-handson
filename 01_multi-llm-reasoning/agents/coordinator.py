@@ -4,8 +4,8 @@ Coordinator Agent - コーディネーターエージェント
 ユーザーの質問を受け取り、タスクを分析・分配する役割を担います。
 """
 
-from .base import create_azure_agent
-from ..config.settings import settings
+from agents.base import create_azure_agent
+from config.settings import settings
 
 
 COORDINATOR_INSTRUCTIONS = """

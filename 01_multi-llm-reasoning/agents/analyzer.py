@@ -5,9 +5,9 @@ Analysis Agent - 分析エージェント
 """
 
 from agent_framework._tools import HostedCodeInterpreterTool
-from .base import create_azure_agent
-from ..config.settings import settings
-from ..tools import (
+from agents.base import create_azure_agent
+from config.settings import settings
+from tools import (
     calculate_statistics,
     compare_data,
     extract_numbers_from_text,

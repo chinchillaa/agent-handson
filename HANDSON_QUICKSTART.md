@@ -172,7 +172,7 @@ uv run python examples/complex_reasoning.py
 
 **音声対話AIチャットボット**
 
-音声で対話できるAIアシスタント（Phase 3: 音声コマンド対応）
+音声で対話できるAIアシスタント（音声コマンド対応）
 
 ```bash
 cd 02_azure-voice-chatbot
@@ -186,7 +186,7 @@ uv run python main.py
 - 「ゆっくり話して」 - 話速を遅く
 - 「音声をリセット」 - デフォルトに戻す
 
-**Phase 3デモ**:
+**高度な機能デモ**:
 ```bash
 uv run python examples/advanced_chat.py
 ```
