@@ -44,7 +44,8 @@ class SpeechSynthesizer:
         self.speech_config.speech_synthesis_language = self.language
 
         # オーディオ設定（デフォルトスピーカー使用）
-        self.audio_config = speechsdk.AudioConfig(use_default_speaker=True)
+        # audio_config=Noneでデフォルトのオーディオ出力デバイスを自動使用
+        self.audio_config = None
 
         # 音声合成器
         self.synthesizer = speechsdk.SpeechSynthesizer(

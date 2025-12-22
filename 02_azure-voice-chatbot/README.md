@@ -487,7 +487,7 @@ uv sync --refresh
 
 ### おすすめリソース
 
-- **Azure AI Foundry**: https://ai.azure.com/
+- **Azure OpenAI Service**: https://learn.microsoft.com/azure/ai-services/openai/
 - **Azure Speech Studio**: https://speech.microsoft.com/
 - **Microsoft Learn**: https://learn.microsoft.com/training/
 

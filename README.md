@@ -16,7 +16,7 @@ Microsoft Agent FrameworkとAzure OpenAI Service (GPT-5)を使って、実践的
 ### 🛠️ 実践的なスキル習得
 - **マルチエージェントシステム**の設計と実装
 - **音声対話AI**の構築方法
-- **Azure AI Foundry**を使った本格的な開発体験
+- **Azure OpenAI Service**を使った本格的な開発体験
 
 ### 💡 すぐに使えるプロダクション品質のコード
 - git cloneして**5分で動く**サンプル
@@ -327,7 +327,7 @@ agent-handson/
 
 ### 🚀 最先端のAI技術
 - **GPT-5**: OpenAIの最新モデルをいち早く利用可能
-- **Azure AI Foundry**: 包括的なAI開発プラットフォーム
+- **Azure OpenAI Service**: エンタープライズ向けAIプラットフォーム
 - **継続的なアップデート**: 最新のAI技術を常に利用可能
 
 ### 💰 柔軟なコスト管理
@@ -347,7 +347,7 @@ agent-handson/
 - **言語**: Python 3.11+
 - **パッケージマネージャー**: uv
 - **エージェントフレームワーク**: Microsoft Agent Framework 1.0.0b251104
-- **LLMプラットフォーム**: Azure AI Foundry (Azure OpenAI Service)
+- **LLMプラットフォーム**: Azure OpenAI Service
   - GPT-5
   - GPT-5-mini
 - **音声サービス**: Azure Speech Service
@@ -427,7 +427,7 @@ uv sync
 
 ### おすすめの次のステップ
 
-- **Azure AI Foundry**: https://ai.azure.com/
+- **Azure OpenAI Service**: https://learn.microsoft.com/azure/ai-services/openai/
 - **Microsoft Agent Framework**: https://github.com/microsoft/agent-framework
 - **Azure OpenAI Service ドキュメント**: https://learn.microsoft.com/azure/ai-services/openai/
 - **Azure Speech Service ドキュメント**: https://learn.microsoft.com/azure/ai-services/speech-service/
@@ -437,9 +437,8 @@ uv sync
 ## 参考資料
 
 - [Microsoft Agent Framework GitHub](https://github.com/microsoft/agent-framework)
-- [Azure AI Foundry Documentation](https://learn.microsoft.com/azure/ai-foundry/)
 - [Azure OpenAI Service Documentation](https://learn.microsoft.com/azure/ai-services/openai/)
-- [GPT-5 in Azure AI Foundry](https://azure.microsoft.com/en-us/blog/gpt-5-in-azure-ai-foundry-the-future-of-ai-apps-and-agents-starts-here/)
+- [Azure OpenAI Service Overview](https://azure.microsoft.com/products/ai-services/openai-service/)
 - [Azure Speech Service Documentation](https://learn.microsoft.com/azure/ai-services/speech-service/)
 
 ---

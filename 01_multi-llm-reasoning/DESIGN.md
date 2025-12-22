@@ -41,7 +41,7 @@ Azure OpenAI Serviceを活用し、複数のAIエージェントが協調して�
   - 情報収集タスクに最適化
 
 **特徴:**
-- Azureの高セキュリティ環境で稼働（Azure AI Foundry）
+- Azureの高セキュリティ環境で稼働（Azure OpenAI Service）
 - エンタープライズグレードのSLA
 - Azure Identity統合による安全な認証
 - OpenTelemetryによる詳細な観測可能性
@@ -360,12 +360,11 @@ except asyncio.TimeoutError:
 ### コア技術
 - **フレームワーク**: Microsoft Agent Framework 1.0.0b251104
 - **言語**: Python 3.11+
-- **LLMプロバイダー**: Azure AI Foundry (Azure OpenAI Service)
+- **LLMプロバイダー**: Azure OpenAI Service
   - **gpt-5** (Coordinator, Analysis, Summary)
   - **gpt-5-mini** (Research)
 
 ### Azure サービス
-- **Azure AI Foundry**: 次世代AIプラットフォーム
 - **Azure OpenAI Service**: GPT-5モデルホスティング
 - **Azure Identity**: 認証・認可
 - **Azure Monitor**: 監視・ログ（オプション）
@@ -457,7 +456,7 @@ client = AzureOpenAIChatClient(
 ### .env ファイル例
 
 ```bash
-# Azure AI Foundry / OpenAI 設定
+# Azure OpenAI Service 設定
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
 AZURE_OPENAI_API_VERSION=2024-08-01-preview
 AZURE_REGION=eastus2  # または swedencentral
@@ -490,7 +489,7 @@ GPT5_TEMPERATURE=0.7
 
 ### 技術的成果
 - **最新GPT-5モデル**を活用したエージェントシステムの構築スキル
-- **Azure AI Foundry**プラットフォームの実践的な理解
+- **Azure OpenAI Service**プラットフォームの実践的な理解
 - Microsoft Agent Frameworkの実践的な使用方法の習得
 - グラフベースワークフローの設計・実装能力
 - マルチエージェントシステムのアーキテクチャ理解
@@ -513,9 +512,8 @@ GPT5_TEMPERATURE=0.7
 - [Agent Framework Blog](https://devblogs.microsoft.com/foundry/introducing-microsoft-agent-framework-the-open-source-engine-for-agentic-ai-apps/)
 
 ### Azure & GPT-5リソース
-- [Azure AI Foundry Documentation](https://learn.microsoft.com/azure/ai-foundry/)
-- [GPT-5 in Azure AI Foundry](https://azure.microsoft.com/en-us/blog/gpt-5-in-azure-ai-foundry-the-future-of-ai-apps-and-agents-starts-here/)
 - [Azure OpenAI Service Documentation](https://learn.microsoft.com/azure/ai-services/openai/)
+- [Azure OpenAI Service Overview](https://azure.microsoft.com/products/ai-services/openai-service/)
 - [OpenAI GPT-5 Introduction](https://openai.com/index/introducing-gpt-5/)
 
 ### 認証・その他
