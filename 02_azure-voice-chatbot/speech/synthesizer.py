@@ -43,14 +43,10 @@ class SpeechSynthesizer:
         self.speech_config.speech_synthesis_voice_name = self.voice_name
         self.speech_config.speech_synthesis_language = self.language
 
-        # オーディオ設定（デフォルトスピーカー使用）
-        # audio_config=Noneでデフォルトのオーディオ出力デバイスを自動使用
-        self.audio_config = None
-
-        # 音声合成器
+        # 音声合成器（デフォルトスピーカーから出力）
+        # audio_configを省略することでデフォルトのオーディオ出力デバイスを使用
         self.synthesizer = speechsdk.SpeechSynthesizer(
-            speech_config=self.speech_config,
-            audio_config=self.audio_config
+            speech_config=self.speech_config
         )
 
     def speak(self, text: str) -> tuple[bool, str]:
