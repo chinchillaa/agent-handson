@@ -105,11 +105,11 @@ class VoiceAgentSession:
             "content": user_input
         })
 
-        # エージェントに送信
-        response = await self.agent.send_message(user_input)
+        # エージェントに送信（Agent Framework 1.0.0b251209ではrun()を使用）
+        response = await self.agent.run(user_input)
 
         # アシスタントの応答を履歴に追加
-        assistant_message = response.get_content()
+        assistant_message = response.text
         self.conversation_history.append({
             "role": "assistant",
             "content": assistant_message
