@@ -30,6 +30,7 @@ class Settings:
     AZURE_OPENAI_DEPLOYMENT_GPT5: str = os.getenv("AZURE_OPENAI_DEPLOYMENT_GPT5", "gpt-5")
 
     # Agent 設定
+    VOICE_AGENT_NAME: str = os.getenv("VOICE_AGENT_NAME", "VoiceAgent")
     MAX_RETRIES: int = int(os.getenv("MAX_RETRIES", "3"))
     TIMEOUT_SECONDS: int = int(os.getenv("TIMEOUT_SECONDS", "60"))
 
