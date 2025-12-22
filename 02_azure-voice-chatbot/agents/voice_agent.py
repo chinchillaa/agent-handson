@@ -87,6 +87,7 @@ class VoiceAgentSession:
             agent: 使用するChatAgentインスタンス
         """
         self.agent = agent
+        self.thread = agent.get_new_thread()  # マルチターン対話用のスレッドを作成
         self.conversation_history: list[dict] = []
 
     async def send_message(self, user_input: str) -> str:
@@ -106,7 +107,8 @@ class VoiceAgentSession:
         })
 
         # エージェントに送信（Agent Framework 1.0.0b251209ではrun()を使用）
-        response = await self.agent.run(user_input)
+        # スレッドを渡すことでマルチターン対話の文脈を保持
+        response = await self.agent.run(user_input, thread=self.thread)
 
         # アシスタントの応答を履歴に追加
         assistant_message = response.text
