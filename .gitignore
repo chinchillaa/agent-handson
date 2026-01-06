@@ -17,3 +17,6 @@ wheels/
 
 # Repository docs (ignored)
 AGENTS.md
+
+# Azure credentials and temp files
+docs/azure/temp.md
