@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>演習1: マルチLLM推論システム - 詳細ガイド</title>
+    <style>
+        :root {
+            --primary-blue: #0066ff;
+            --neon-cyan: #00ffff;
+            --dark-bg: #1e1e1e;
+            --darker-bg: #121212;
+            --card-bg: #2a2a2a;
+            --card-bg-light: #333333;
+            --success-green: #00ff88;
+            --warning-orange: #ffaa00;
+            --error-red: #ff4466;
+            --text-light: #ffffff;
+            --text-muted: #b0b0b0;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DejaVu Sans', 'Noto Sans JP', sans-serif;
+            line-height: 1.8;
+            color: var(--text-light);
+            background: var(--dark-bg);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
+            padding: 3rem 2rem;
+            text-align: center;
+            border-bottom: 3px solid var(--primary-blue);
+            position: relative;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .breadcrumb {
+            padding: 1rem 2rem;
+            background: var(--darker-bg);
+        }
+
+        .breadcrumb a {
+            color: var(--neon-cyan);
+            text-decoration: none;
+        }
+
+        .breadcrumb span {
+            color: var(--text-muted);
+        }
+
+        section {
+            padding: 3rem 0;
+            border-bottom: 1px solid rgba(0, 102, 255, 0.2);
+        }
+
+        section:last-of-type {
+            border-bottom: none;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--white);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-blue);
+            display: inline-block;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--neon-cyan);
+            margin: 2rem 0 1rem;
+        }
+
+        h4 {
+            font-size: 1.2rem;
+            color: var(--white);
+            margin: 1.5rem 0 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            border: 1px solid rgba(0, 102, 255, 0.2);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.1), rgba(0, 255, 255, 0.05));
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .success-card {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 136, 0.02));
+            border-left: 4px solid var(--success-green);
+        }
+
+        .warning-card {
+            background: linear-gradient(135deg, rgba(255, 170, 0, 0.1), rgba(255, 170, 0, 0.02));
+            border-left: 4px solid var(--warning-orange);
+        }
+
+        .danger-card {
+            background: linear-gradient(135deg, rgba(255, 68, 102, 0.1), rgba(255, 68, 102, 0.02));
+            border-left: 4px solid var(--error-red);
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+            color: var(--text-muted);
+        }
+
+        li strong {
+            color: var(--white);
+        }
+
+        code {
+            background: var(--darker-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            color: var(--neon-cyan);
+            font-size: 0.9rem;
+        }
+
+        pre {
+            background: var(--darker-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--text-light);
+        }
+
+        .architecture-diagram {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .flow-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .flow-item {
+            background: linear-gradient(135deg, var(--card-bg-light), var(--card-bg));
+            border: 2px solid var(--primary-blue);
+            border-radius: 15px;
+            padding: 1.5rem;
+            min-width: 150px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .flow-item:hover {
+            transform: scale(1.05);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .flow-item .icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .flow-item strong {
+            display: block;
+            color: var(--white);
+            font-size: 1.1rem;
+        }
+
+        .flow-item span {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .flow-arrow {
+            font-size: 2rem;
+            color: var(--neon-cyan);
+        }
+
+        .file-tree {
+            background: var(--darker-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            font-family: 'Consolas', monospace;
+            margin: 1rem 0;
+        }
+
+        .file-tree ul {
+            list-style: none;
+            padding-left: 1.5rem;
+        }
+
+        .file-tree li {
+            color: var(--text-muted);
+            padding: 0.2rem 0;
+        }
+
+        .file-tree li::before {
+            content: '├── ';
+            color: var(--text-muted);
+        }
+
+        .file-tree li:last-child::before {
+            content: '└── ';
+        }
+
+        .file-tree .folder {
+            color: var(--primary-blue);
+        }
+
+        .file-tree .file {
+            color: var(--success-green);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin: 0.2rem;
+        }
+
+        .badge-blue {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .badge-green {
+            background: var(--success-green);
+            color: var(--dark-bg);
+        }
+
+        .badge-orange {
+            background: var(--warning-orange);
+            color: var(--dark-bg);
+        }
+
+        .step-list {
+            counter-reset: step-counter;
+            list-style: none;
+            padding: 0;
+        }
+
+        .step-list li {
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 3.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .step-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--neon-cyan));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark-bg);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: var(--primary-blue);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .back-link:hover {
+            background: var(--neon-cyan);
+            color: var(--dark-bg);
+        }
+
+        footer {
+            background: var(--darker-bg);
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        footer p {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .flow-container {
+                flex-direction: column;
+            }
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+            header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="breadcrumb">
+        <a href="../20251202_Azure_AI_Agent_ハンズオン.html">← メイン講義に戻る</a>
+    </div>
+
+    <header>
+        <h1>🔬 演習1: マルチLLM推論システム</h1>
+        <p>01_multi-llm-reasoning 詳細ガイド</p>
+    </header>
+
+    <div class="container">
+        <!-- WHY セクション -->
+        <section id="why">
+            <h2>🤔 WHY - なぜこのアーキテクチャなのか</h2>
+
+            <div class="card info-card">
+                <h3>単一LLMの限界</h3>
+                <p>複雑な質問に対して、1つのLLMだけで回答しようとすると以下の問題が発生します：</p>
+                <ul>
+                    <li><strong>思考の混乱</strong>: 調査、分析、整形を同時に行おうとして焦点がぼやける</li>
+                    <li><strong>品質のばらつき</strong>: 時には詳細すぎ、時には浅すぎる回答になる</li>
+                    <li><strong>デバッグの困難</strong>: どこで間違えたのか特定しにくい</li>
+                </ul>
+            </div>
+
+            <div class="card success-card">
+                <h3>マルチエージェントの利点</h3>
+                <p>「分割統治」の考え方で、各エージェントに明確な役割を与えることで：</p>
+                <ul>
+                    <li><strong>専門性の発揮</strong>: 各エージェントが自分の役割に集中できる</li>
+                    <li><strong>品質の安定</strong>: 各フェーズでアウトプットを検証可能</li>
+                    <li><strong>デバッグの容易さ</strong>: どのエージェントで問題が起きたか明確</li>
+                    <li><strong>柔軟な改善</strong>: 特定のエージェントだけを改良できる</li>
+                </ul>
+            </div>
+
+            <div class="card warning-card">
+                <h3>⚠️ トレードオフを理解する</h3>
+                <ul>
+                    <li><strong>レイテンシ増加</strong>: 4回のLLM呼び出しで応答時間が長くなる</li>
+                    <li><strong>コスト増加</strong>: API呼び出し回数が増える</li>
+                    <li><strong>複雑性</strong>: エージェント間の連携設計が必要</li>
+                </ul>
+                <p style="margin-top: 1rem; color: var(--warning-orange);"><strong>→ 「複雑な分析タスク」には有効だが、「シンプルなQ&A」には過剰な場合も</strong></p>
+            </div>
+        </section>
+
+        <!-- WHAT セクション -->
+        <section id="what">
+            <h2>📋 WHAT - 何を作るのか</h2>
+
+            <h3>アーキテクチャ概要</h3>
+            <div class="architecture-diagram">
+                <div class="flow-container">
+                    <div class="flow-item">
+                        <div class="icon">👤</div>
+                        <strong>ユーザー</strong>
+                        <span>質問を入力</span>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item" style="border-color: var(--warning-orange);">
+                        <div class="icon">🎯</div>
+                        <strong>Coordinator</strong>
+                        <span>計画立案</span>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item" style="border-color: var(--primary-blue);">
+                        <div class="icon">🔍</div>
+                        <strong>Researcher</strong>
+                        <span>情報収集</span>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item" style="border-color: var(--success-green);">
+                        <div class="icon">📊</div>
+                        <strong>Analyzer</strong>
+                        <span>分析・洞察</span>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item" style="border-color: var(--neon-cyan);">
+                        <div class="icon">📝</div>
+                        <strong>Summarizer</strong>
+                        <span>最終回答</span>
+                    </div>
+                </div>
+            </div>
+
+            <h3>各エージェントの責務</h3>
+            <div class="card-grid">
+                <div class="card" style="border-top: 4px solid var(--warning-orange);">
+                    <h4>🎯 Coordinator</h4>
+                    <p><span class="badge badge-orange">Phase 1</span></p>
+                    <ul>
+                        <li>質問の意図を分析</li>
+                        <li>必要な情報を特定</li>
+                        <li>調査計画を立案</li>
+                    </ul>
+                    <p style="font-size: 0.85rem;"><code>agents/coordinator.py</code></p>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--primary-blue);">
+                    <h4>🔍 Researcher</h4>
+                    <p><span class="badge badge-blue">Phase 2</span></p>
+                    <ul>
+                        <li>Web検索で情報収集</li>
+                        <li>複数ソースから取得</li>
+                        <li>関連情報を整理</li>
+                    </ul>
+                    <p style="font-size: 0.85rem;"><code>agents/researcher.py</code></p>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--success-green);">
+                    <h4>📊 Analyzer</h4>
+                    <p><span class="badge badge-green">Phase 3</span></p>
+                    <ul>
+                        <li>データを分析</li>
+                        <li>パターン・傾向を特定</li>
+                        <li>洞察を導出</li>
+                    </ul>
+                    <p style="font-size: 0.85rem;"><code>agents/analyzer.py</code></p>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--neon-cyan);">
+                    <h4>📝 Summarizer</h4>
+                    <p><span class="badge" style="background: var(--neon-cyan); color: var(--dark-bg);">Phase 4</span></p>
+                    <ul>
+                        <li>全情報を統合</li>
+                        <li>最終回答を作成</li>
+                        <li>読みやすく整形</li>
+                    </ul>
+                    <p style="font-size: 0.85rem;"><code>agents/summarizer.py</code></p>
+                </div>
+            </div>
+
+            <h3>ディレクトリ構成</h3>
+            <div class="file-tree">
+                <span class="folder">01_multi-llm-reasoning/</span>
+                <ul>
+                    <li><span class="folder">agents/</span> - エージェント定義
+                        <ul>
+                            <li><span class="file">coordinator.py</span></li>
+                            <li><span class="file">researcher.py</span></li>
+                            <li><span class="file">analyzer.py</span></li>
+                            <li><span class="file">summarizer.py</span></li>
+                            <li><span class="file">base.py</span> - 共通基盤</li>
+                        </ul>
+                    </li>
+                    <li><span class="folder">tools/</span> - ツール定義
+                        <ul>
+                            <li><span class="file">web_tools.py</span> - Web検索</li>
+                            <li><span class="file">analysis_tools.py</span> - 分析ツール</li>
+                            <li><span class="file">formatting_tools.py</span> - 整形ツール</li>
+                        </ul>
+                    </li>
+                    <li><span class="folder">config/</span> - 設定
+                        <ul>
+                            <li><span class="file">settings.py</span></li>
+                        </ul>
+                    </li>
+                    <li><span class="file">workflow.py</span> - ワークフロー管理</li>
+                    <li><span class="file">main.py</span> - エントリーポイント</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- HOW セクション -->
+        <section id="how">
+            <h2>🔧 HOW - どう動かすのか</h2>
+
+            <h3>セットアップ手順</h3>
+            <ol class="step-list">
+                <li>
+                    <strong>環境変数の設定</strong>
+                    <p><code>.env</code>ファイルを作成し、Azure OpenAIの接続情報を設定</p>
+                    <pre><code># .env
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
+AZURE_OPENAI_API_KEY=your-api-key
+AZURE_OPENAI_DEPLOYMENT_GPT5=gpt-5
+AZURE_OPENAI_DEPLOYMENT_GPT5_MINI=gpt-5-mini</code></pre>
+                </li>
+                <li>
+                    <strong>依存パッケージのインストール</strong>
+                    <pre><code>cd 01_multi-llm-reasoning
+uv pip install -r requirements.txt</code></pre>
+                </li>
+                <li>
+                    <strong>実行</strong>
+                    <pre><code>python main.py "量子コンピューターの現状と将来性について教えてください"</code></pre>
+                </li>
+            </ol>
+
+            <h3>コードのポイント解説</h3>
+
+            <div class="card info-card">
+                <h4>ワークフロー制御 (workflow.py)</h4>
+                <p>各エージェントを順次実行し、出力を次のエージェントに引き継ぎます。</p>
+                <pre><code># 実行フロー
+coordinator_output = await self.run_coordinator(user_query)
+researcher_output = await self.run_researcher(coordinator_output, user_query)
+analyzer_output = await self.run_analyzer(researcher_output, coordinator_output, user_query)
+final_answer = await self.run_summarizer(analyzer_output, researcher_output, coordinator_output, user_query)</code></pre>
+                <p style="margin-top: 1rem;"><strong>注目ポイント:</strong> 各フェーズの出力が次のフェーズの入力になっている「バトンリレー」構造</p>
+            </div>
+
+            <div class="card info-card">
+                <h4>エージェント定義 (agents/coordinator.py)</h4>
+                <p>システムプロンプトで役割を明確に定義します。</p>
+                <pre><code>COORDINATOR_INSTRUCTIONS = """
+あなたは優秀なタスクコーディネーターです。
+ユーザーからの質問を受け取り、それを分析して適切なタスクに分解します。
+
+**出力形式:**
+【質問の理解】
+- ユーザーが知りたいことの核心
+【必要な情報】
+- 収集すべき情報のリスト
+【次のステップへの指示】
+Researcherに対する具体的な調査依頼
+"""</code></pre>
+                <p style="margin-top: 1rem;"><strong>注目ポイント:</strong> 出力形式を明確に指定することで、後続エージェントが解析しやすくなる</p>
+            </div>
+        </section>
+
+        <!-- NEXT STEP セクション -->
+        <section id="nextstep">
+            <h2>🚀 NEXT STEP - 実務で追加が必要なこと</h2>
+
+            <div class="card-grid">
+                <div class="card danger-card">
+                    <h4>❗ エラーハンドリング</h4>
+                    <ul>
+                        <li>API呼び出し失敗時のリトライ</li>
+                        <li>タイムアウト処理</li>
+                        <li>フォールバック戦略</li>
+                    </ul>
+                </div>
+
+                <div class="card danger-card">
+                    <h4>❗ コスト管理</h4>
+                    <ul>
+                        <li>トークン使用量の監視</li>
+                        <li>予算上限の設定</li>
+                        <li>キャッシュ戦略</li>
+                    </ul>
+                </div>
+
+                <div class="card warning-card">
+                    <h4>⚠️ ログ・モニタリング</h4>
+                    <ul>
+                        <li>各エージェントの実行ログ</li>
+                        <li>処理時間の計測</li>
+                        <li>品質メトリクスの収集</li>
+                    </ul>
+                </div>
+
+                <div class="card warning-card">
+                    <h4>⚠️ 品質保証</h4>
+                    <ul>
+                        <li>出力の検証ロジック</li>
+                        <li>ハルシネーション検出</li>
+                        <li>人間によるレビューフロー</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 2rem; text-align: center; background: linear-gradient(135deg, rgba(0, 102, 255, 0.2), rgba(0, 255, 255, 0.1)); border: 2px solid var(--neon-cyan);">
+                <h3 style="color: var(--white); margin-bottom: 1rem;">🎯 持ち帰りメッセージ</h3>
+                <p style="font-size: 1.3rem; color: var(--white);">
+                    「複数エージェントを協調させる場合、<br>
+                    <strong style="color: var(--neon-cyan);">誰が何を判断するか</strong>の設計が最重要。<br>
+                    コードを書く前に役割分担を決める」
+                </p>
+            </div>
+        </section>
+
+        <!-- 関連リンク -->
+        <section>
+            <h2>📚 関連リソース</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h4>📝 確認クイズ</h4>
+                    <p>理解度をチェック</p>
+                    <a href="../question/01_multi-llm-reasoning_quiz.html" style="color: var(--neon-cyan);">問題を解く →</a>
+                </div>
+                <div class="card">
+                    <h4>✅ 解答・解説</h4>
+                    <p>詳細な解説を確認</p>
+                    <a href="../answer/01_multi-llm-reasoning_answer.html" style="color: var(--neon-cyan);">解答を見る →</a>
+                </div>
+            </div>
+
+            <a href="../20251202_Azure_AI_Agent_ハンズオン.html" class="back-link">← メイン講義に戻る</a>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 SB C&S株式会社 - Azure AI Agentハンズオン</p>
+    </footer>
+</body>
+</html>

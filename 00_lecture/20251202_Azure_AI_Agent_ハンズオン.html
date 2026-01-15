@@ -727,10 +727,11 @@
         <div class="container">
             <div class="logo">🤖 Azure AI Agent</div>
             <ul>
+                <li><a href="#expectation">本日について</a></li>
                 <li><a href="#intro">はじめに</a></li>
                 <li><a href="#mechanism">仕組み</a></li>
-                <li><a href="#role">役割</a></li>
                 <li><a href="#roadmap">ロードマップ</a></li>
+                <li><a href="#handson">演習</a></li>
                 <li><a href="#summary">まとめ</a></li>
             </ul>
         </div>
@@ -746,6 +747,59 @@
                 <span>🤖</span>
                 <span>☁️</span>
                 <span>🚀</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 本日のハンズオンについて（期待値設定） -->
+    <section id="expectation" style="background: var(--darker-bg);">
+        <div class="container">
+            <div class="section-title">
+                <h2>本日のハンズオンについて</h2>
+                <p>はじめに理解しておいていただきたいこと</p>
+            </div>
+
+            <div class="card warning-card fade-in" style="text-align: center; padding: 3rem;">
+                <div style="font-size: 3rem; margin-bottom: 1.5rem;">📚</div>
+                <p style="font-size: 1.4rem; margin-bottom: 1.5rem;">
+                    <strong>今日作るものは本番環境にそのまま使えるものではありません。</strong>
+                </p>
+                <p style="font-size: 1.2rem; color: var(--text-muted);">
+                    しかし、AIエージェント開発で必ず直面する<br>
+                    <span style="color: var(--neon-cyan); font-weight: bold;">「設計上の判断ポイント」</span>を体験していただきます。
+                </p>
+            </div>
+
+            <div class="two-columns" style="margin-top: 3rem;">
+                <div class="card success-card fade-in">
+                    <h3><span class="icon">✅</span> 本日学べること</h3>
+                    <ul>
+                        <li><strong>マルチエージェントの設計思想</strong><br>
+                        <span class="small-text">役割分担とワークフロー設計の基本</span></li>
+                        <li><strong>音声対話システムの構造</strong><br>
+                        <span class="small-text">ステート管理と安全機構の重要性</span></li>
+                        <li><strong>Azure AI サービスの活用方法</strong><br>
+                        <span class="small-text">OpenAI / Speech Service の基本的な使い方</span></li>
+                    </ul>
+                </div>
+
+                <div class="card info-card fade-in">
+                    <h3><span class="icon">🔧</span> 実務で追加が必要なこと</h3>
+                    <ul>
+                        <li><strong>エラーハンドリング・リトライ機構</strong></li>
+                        <li><strong>認証・セキュリティ強化</strong></li>
+                        <li><strong>ログ・モニタリング</strong></li>
+                        <li><strong>コスト管理・スケーリング</strong></li>
+                        <li><strong>テスト・CI/CD</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card fade-in" style="margin-top: 3rem; text-align: center; background: linear-gradient(135deg, rgba(0, 102, 255, 0.2), rgba(0, 255, 255, 0.1)); border-color: var(--neon-cyan);">
+                <p style="font-size: 1.3rem;">
+                    <strong>「基礎を理解し、実務への架け橋を作る」</strong><br>
+                    <span style="color: var(--text-muted);">これが本日のゴールです</span>
+                </p>
             </div>
         </div>
     </section>
@@ -975,6 +1029,88 @@
                             <p style="font-size: 1.3rem; margin-top: 1rem;"><strong>「作って終わり」ではなく評価・改善のサイクルを回し続けましょう。</strong></p>
                             <p class="small-text" style="margin-top: 1rem;">継続的なモニタリングとフィードバックで精度を高めていきます</p>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ハンズオン演習 -->
+    <section id="handson">
+        <div class="container">
+            <div class="section-title">
+                <h2>ハンズオン演習</h2>
+                <p>2つの演習でAIエージェント開発の基礎を体験します</p>
+            </div>
+
+            <div class="two-columns">
+                <!-- 演習1 -->
+                <div class="card fade-in" style="border-color: var(--primary-blue);">
+                    <h3><span class="icon">🔬</span> 演習1: マルチLLM推論システム</h3>
+
+                    <div style="margin: 1.5rem 0; padding: 1rem; background: rgba(0, 102, 255, 0.1); border-radius: 10px;">
+                        <strong style="color: var(--neon-cyan);">📁 01_multi-llm-reasoning</strong>
+                    </div>
+
+                    <h4 style="color: var(--neon-cyan); margin-top: 1.5rem;">WHY - なぜこのアーキテクチャなのか</h4>
+                    <p class="small-text">複雑な質問に対して、単一LLMでは限界がある。役割分担による「分割統治」で品質を向上させる</p>
+
+                    <h4 style="color: var(--neon-cyan); margin-top: 1.5rem;">WHAT - 何を作るのか</h4>
+                    <ul class="small-text">
+                        <li><strong>Coordinator</strong>: 質問を分析し計画を立案</li>
+                        <li><strong>Researcher</strong>: Web検索で情報収集</li>
+                        <li><strong>Analyzer</strong>: データ分析と洞察</li>
+                        <li><strong>Summarizer</strong>: 最終回答を整形</li>
+                    </ul>
+
+                    <h4 style="color: var(--neon-cyan); margin-top: 1.5rem;">🎯 持ち帰りメッセージ</h4>
+                    <div class="card success-card" style="margin-top: 0.5rem; padding: 1rem;">
+                        <p class="small-text" style="margin: 0;">「複数エージェントを協調させる場合、<strong>誰が何を判断するか</strong>の設計が最重要。コードより先に役割分担を決める」</p>
+                    </div>
+
+                    <a href="guide/01_multi-llm-reasoning_guide.html" style="display: inline-block; margin-top: 1.5rem; padding: 0.8rem 1.5rem; background: var(--primary-blue); color: white; text-decoration: none; border-radius: 8px; transition: all 0.3s;">📖 詳細ガイドを見る</a>
+                </div>
+
+                <!-- 演習2 -->
+                <div class="card fade-in" style="border-color: var(--success-green);">
+                    <h3><span class="icon">🎙️</span> 演習2: Azure音声チャットボット</h3>
+
+                    <div style="margin: 1.5rem 0; padding: 1rem; background: rgba(0, 255, 136, 0.1); border-radius: 10px;">
+                        <strong style="color: var(--success-green);">📁 02_azure-voice-chatbot</strong>
+                    </div>
+
+                    <h4 style="color: var(--success-green); margin-top: 1.5rem;">WHY - なぜこのアーキテクチャなのか</h4>
+                    <p class="small-text">音声対話は「暴走」のリスクがある。明確な制限と安全機構を最初から設計に組み込む必要がある</p>
+
+                    <h4 style="color: var(--success-green); margin-top: 1.5rem;">WHAT - 何を作るのか</h4>
+                    <ul class="small-text">
+                        <li><strong>Speech-to-Text</strong>: 音声を文字起こし</li>
+                        <li><strong>VoiceAgent</strong>: GPTで応答生成</li>
+                        <li><strong>Text-to-Speech</strong>: 応答を音声化</li>
+                        <li><strong>安全機構</strong>: ターン制限・タイムアウト</li>
+                    </ul>
+
+                    <h4 style="color: var(--success-green); margin-top: 1.5rem;">🎯 持ち帰りメッセージ</h4>
+                    <div class="card success-card" style="margin-top: 0.5rem; padding: 1rem;">
+                        <p class="small-text" style="margin: 0;">「音声エージェントは<strong>暴走防止の設計</strong>が必須。MAX_TURNS、タイムアウト、エラー上限は最初から組み込む」</p>
+                    </div>
+
+                    <a href="guide/02_azure-voice-chatbot_guide.html" style="display: inline-block; margin-top: 1.5rem; padding: 0.8rem 1.5rem; background: var(--success-green); color: var(--dark-bg); text-decoration: none; border-radius: 8px; transition: all 0.3s; font-weight: bold;">📖 詳細ガイドを見る</a>
+                </div>
+            </div>
+
+            <!-- 議論を促す問いかけ -->
+            <div class="card warning-card fade-in" style="margin-top: 3rem;">
+                <h3><span class="icon">💭</span> 考えてみよう</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+                    <div style="padding: 1rem; background: rgba(255, 170, 0, 0.1); border-radius: 10px;">
+                        <p class="small-text" style="margin: 0;"><strong>Q1:</strong> Coordinatorが間違った判断をしたらどうリカバリする？</p>
+                    </div>
+                    <div style="padding: 1rem; background: rgba(255, 170, 0, 0.1); border-radius: 10px;">
+                        <p class="small-text" style="margin: 0;"><strong>Q2:</strong> 音声認識が連続で失敗したとき、ユーザー体験をどう保つ？</p>
+                    </div>
+                    <div style="padding: 1rem; background: rgba(255, 170, 0, 0.1); border-radius: 10px;">
+                        <p class="small-text" style="margin: 0;"><strong>Q3:</strong> このシステムのコストを1/10にするには何を削る？</p>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>演習2: Azure音声チャットボット - 詳細ガイド</title>
+    <style>
+        :root {
+            --primary-blue: #0066ff;
+            --neon-cyan: #00ffff;
+            --dark-bg: #1e1e1e;
+            --darker-bg: #121212;
+            --card-bg: #2a2a2a;
+            --card-bg-light: #333333;
+            --success-green: #00ff88;
+            --warning-orange: #ffaa00;
+            --error-red: #ff4466;
+            --text-light: #ffffff;
+            --text-muted: #b0b0b0;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DejaVu Sans', 'Noto Sans JP', sans-serif;
+            line-height: 1.8;
+            color: var(--text-light);
+            background: var(--dark-bg);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
+            padding: 3rem 2rem;
+            text-align: center;
+            border-bottom: 3px solid var(--success-green);
+            position: relative;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--success-green), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .breadcrumb {
+            padding: 1rem 2rem;
+            background: var(--darker-bg);
+        }
+
+        .breadcrumb a {
+            color: var(--neon-cyan);
+            text-decoration: none;
+        }
+
+        section {
+            padding: 3rem 0;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        section:last-of-type {
+            border-bottom: none;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--white);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--success-green);
+            display: inline-block;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--success-green);
+            margin: 2rem 0 1rem;
+        }
+
+        h4 {
+            font-size: 1.2rem;
+            color: var(--white);
+            margin: 1.5rem 0 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.1), rgba(0, 255, 255, 0.05));
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .success-card {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 136, 0.02));
+            border-left: 4px solid var(--success-green);
+        }
+
+        .warning-card {
+            background: linear-gradient(135deg, rgba(255, 170, 0, 0.1), rgba(255, 170, 0, 0.02));
+            border-left: 4px solid var(--warning-orange);
+        }
+
+        .danger-card {
+            background: linear-gradient(135deg, rgba(255, 68, 102, 0.1), rgba(255, 68, 102, 0.02));
+            border-left: 4px solid var(--error-red);
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+            color: var(--text-muted);
+        }
+
+        li strong {
+            color: var(--white);
+        }
+
+        code {
+            background: var(--darker-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            color: var(--success-green);
+            font-size: 0.9rem;
+        }
+
+        pre {
+            background: var(--darker-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--text-light);
+        }
+
+        .architecture-diagram {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .flow-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .flow-item {
+            background: linear-gradient(135deg, var(--card-bg-light), var(--card-bg));
+            border: 2px solid var(--success-green);
+            border-radius: 15px;
+            padding: 1.5rem;
+            min-width: 150px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .flow-item:hover {
+            transform: scale(1.05);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .flow-item .icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .flow-item strong {
+            display: block;
+            color: var(--white);
+            font-size: 1.1rem;
+        }
+
+        .flow-item span {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .flow-arrow {
+            font-size: 2rem;
+            color: var(--success-green);
+        }
+
+        .safety-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .safety-item {
+            background: linear-gradient(135deg, rgba(255, 68, 102, 0.2), rgba(255, 68, 102, 0.05));
+            border: 2px solid var(--error-red);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .safety-item .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .safety-item strong {
+            display: block;
+            color: var(--error-red);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .safety-item code {
+            display: block;
+            margin-top: 0.5rem;
+            background: var(--darker-bg);
+            padding: 0.5rem;
+            border-radius: 5px;
+        }
+
+        .file-tree {
+            background: var(--darker-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            font-family: 'Consolas', monospace;
+            margin: 1rem 0;
+        }
+
+        .file-tree ul {
+            list-style: none;
+            padding-left: 1.5rem;
+        }
+
+        .file-tree li {
+            color: var(--text-muted);
+            padding: 0.2rem 0;
+        }
+
+        .file-tree li::before {
+            content: '├── ';
+            color: var(--text-muted);
+        }
+
+        .file-tree li:last-child::before {
+            content: '└── ';
+        }
+
+        .file-tree .folder {
+            color: var(--success-green);
+        }
+
+        .file-tree .file {
+            color: var(--neon-cyan);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin: 0.2rem;
+        }
+
+        .badge-green {
+            background: var(--success-green);
+            color: var(--dark-bg);
+        }
+
+        .badge-orange {
+            background: var(--warning-orange);
+            color: var(--dark-bg);
+        }
+
+        .badge-red {
+            background: var(--error-red);
+            color: var(--white);
+        }
+
+        .step-list {
+            counter-reset: step-counter;
+            list-style: none;
+            padding: 0;
+        }
+
+        .step-list li {
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 3.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .step-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--success-green), var(--neon-cyan));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark-bg);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .loop-diagram {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .loop-box {
+            background: var(--card-bg);
+            border: 2px dashed var(--warning-orange);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .loop-label {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: var(--warning-orange);
+            color: var(--dark-bg);
+            padding: 0.3rem 1rem;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: var(--success-green);
+            color: var(--dark-bg);
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .back-link:hover {
+            background: var(--neon-cyan);
+        }
+
+        footer {
+            background: var(--darker-bg);
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            border-top: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        footer p {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .flow-container {
+                flex-direction: column;
+            }
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+            .safety-grid {
+                grid-template-columns: 1fr;
+            }
+            header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="breadcrumb">
+        <a href="../20251202_Azure_AI_Agent_ハンズオン.html">← メイン講義に戻る</a>
+    </div>
+
+    <header>
+        <h1>🎙️ 演習2: Azure音声チャットボット</h1>
+        <p>02_azure-voice-chatbot 詳細ガイド</p>
+    </header>
+
+    <div class="container">
+        <!-- WHY セクション -->
+        <section id="why">
+            <h2>🤔 WHY - なぜこのアーキテクチャなのか</h2>
+
+            <div class="card danger-card">
+                <h3>⚠️ 音声対話システムの危険性</h3>
+                <p>音声対話システムは「暴走」のリスクが特に高いです：</p>
+                <ul>
+                    <li><strong>無限ループ</strong>: ユーザーが終了を言わない限り永遠に続く可能性</li>
+                    <li><strong>コスト爆発</strong>: 音声認識＋LLM＋音声合成の3重課金</li>
+                    <li><strong>リソース枯渇</strong>: メモリやAPI制限の消費</li>
+                    <li><strong>ユーザー体験の悪化</strong>: エラーが連続するとイライラを招く</li>
+                </ul>
+            </div>
+
+            <div class="card success-card">
+                <h3>✅ 安全設計のアプローチ</h3>
+                <p>「制限を最初から設計に組み込む」ことで安全を確保します：</p>
+                <ul>
+                    <li><strong>ターン数制限</strong>: 最大会話回数を設定</li>
+                    <li><strong>タイムアウト</strong>: セッション時間の上限</li>
+                    <li><strong>連続エラー制限</strong>: エラーが続いたら停止</li>
+                    <li><strong>明示的な終了コマンド</strong>: ユーザーが簡単に終了可能</li>
+                </ul>
+            </div>
+
+            <div class="card warning-card">
+                <h3>💡 設計思想: "Fail-Safe"</h3>
+                <p>「何か問題が起きたら安全な状態に戻る」という原則に従います。</p>
+                <p style="color: var(--warning-orange); font-weight: bold;">「動き続ける」よりも「安全に止まる」を優先する設計</p>
+            </div>
+        </section>
+
+        <!-- WHAT セクション -->
+        <section id="what">
+            <h2>📋 WHAT - 何を作るのか</h2>
+
+            <h3>アーキテクチャ概要</h3>
+            <div class="architecture-diagram">
+                <div class="loop-diagram">
+                    <div class="loop-box">
+                        <div class="loop-label">🔄 対話ループ</div>
+                        <div class="flow-container">
+                            <div class="flow-item">
+                                <div class="icon">🎤</div>
+                                <strong>Speech-to-Text</strong>
+                                <span>Azure Speech</span>
+                            </div>
+                            <div class="flow-arrow">→</div>
+                            <div class="flow-item" style="border-color: var(--primary-blue);">
+                                <div class="icon">🤖</div>
+                                <strong>VoiceAgent</strong>
+                                <span>GPT-5</span>
+                            </div>
+                            <div class="flow-arrow">→</div>
+                            <div class="flow-item">
+                                <div class="icon">🔊</div>
+                                <strong>Text-to-Speech</strong>
+                                <span>Azure Speech</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>🛡️ 安全機構（最重要）</h3>
+            <div class="safety-grid">
+                <div class="safety-item">
+                    <div class="icon">🔢</div>
+                    <strong>ターン数制限</strong>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">最大会話回数</p>
+                    <code>MAX_CONVERSATION_TURNS</code>
+                </div>
+                <div class="safety-item">
+                    <div class="icon">⏱️</div>
+                    <strong>セッション時間制限</strong>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">最大継続時間</p>
+                    <code>MAX_SESSION_DURATION</code>
+                </div>
+                <div class="safety-item">
+                    <div class="icon">❌</div>
+                    <strong>連続エラー制限</strong>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">エラー回数上限</p>
+                    <code>MAX_CONSECUTIVE_ERRORS</code>
+                </div>
+            </div>
+
+            <h3>主要コンポーネント</h3>
+            <div class="card-grid">
+                <div class="card" style="border-top: 4px solid var(--success-green);">
+                    <h4>🎤 SpeechRecognizer</h4>
+                    <p>Azure Speech-to-Textを使用</p>
+                    <ul>
+                        <li>マイクから音声を取得</li>
+                        <li>日本語テキストに変換</li>
+                        <li>再試行機能付き</li>
+                    </ul>
+                    <p style="font-size: 0.85rem;"><code>speech/recognizer.py</code></p>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--primary-blue);">
+                    <h4>🤖 VoiceAgentSession</h4>
+                    <p>GPT-5ベースのエージェント</p>
+                    <ul>
+                        <li>マルチターン会話対応</li>
+                        <li>会話履歴の管理</li>
+                        <li>音声向けプロンプト</li>
+                    </ul>
+                    <p style="font-size: 0.85rem;"><code>agents/voice_agent.py</code></p>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--neon-cyan);">
+                    <h4>🔊 SpeechSynthesizer</h4>
+                    <p>Azure Text-to-Speechを使用</p>
+                    <ul>
+                        <li>テキストを音声化</li>
+                        <li>話速調整可能</li>
+                        <li>複数音声プロファイル</li>
+                    </ul>
+                    <p style="font-size: 0.85rem;"><code>speech/synthesizer.py</code></p>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--error-red);">
+                    <h4>🛡️ VoiceChat</h4>
+                    <p>安全な対話ループ管理</p>
+                    <ul>
+                        <li>安全制限のチェック</li>
+                        <li>終了コマンド検出</li>
+                        <li>統計情報の表示</li>
+                    </ul>
+                    <p style="font-size: 0.85rem;"><code>voice_chat.py</code></p>
+                </div>
+            </div>
+
+            <h3>ディレクトリ構成</h3>
+            <div class="file-tree">
+                <span class="folder">02_azure-voice-chatbot/</span>
+                <ul>
+                    <li><span class="folder">speech/</span> - 音声処理
+                        <ul>
+                            <li><span class="file">recognizer.py</span> - 音声認識</li>
+                            <li><span class="file">synthesizer.py</span> - 音声合成</li>
+                        </ul>
+                    </li>
+                    <li><span class="folder">agents/</span> - エージェント定義
+                        <ul>
+                            <li><span class="file">voice_agent.py</span> - 音声エージェント</li>
+                            <li><span class="file">base.py</span> - 共通基盤</li>
+                        </ul>
+                    </li>
+                    <li><span class="folder">config/</span> - 設定
+                        <ul>
+                            <li><span class="file">settings.py</span> - 安全設定含む</li>
+                            <li><span class="file">voice_profiles.py</span> - 音声プロファイル</li>
+                        </ul>
+                    </li>
+                    <li><span class="folder">tools/</span> - ツール
+                        <ul>
+                            <li><span class="file">context_manager.py</span></li>
+                            <li><span class="file">conversation_summarizer.py</span></li>
+                        </ul>
+                    </li>
+                    <li><span class="file">voice_chat.py</span> - 対話ループ管理</li>
+                    <li><span class="file">main.py</span> - エントリーポイント</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- HOW セクション -->
+        <section id="how">
+            <h2>🔧 HOW - どう動かすのか</h2>
+
+            <h3>セットアップ手順</h3>
+            <ol class="step-list">
+                <li>
+                    <strong>環境変数の設定</strong>
+                    <p><code>.env</code>ファイルを作成</p>
+                    <pre><code># .env
+# Azure OpenAI
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
+AZURE_OPENAI_API_KEY=your-openai-api-key
+
+# Azure Speech Service
+AZURE_SPEECH_KEY=your-speech-api-key
+AZURE_SPEECH_REGION=japaneast</code></pre>
+                </li>
+                <li>
+                    <strong>依存パッケージのインストール</strong>
+                    <pre><code>cd 02_azure-voice-chatbot
+uv pip install -r requirements.txt</code></pre>
+                </li>
+                <li>
+                    <strong>マイクの確認</strong>
+                    <p>PCのマイクが有効になっていることを確認してください</p>
+                </li>
+                <li>
+                    <strong>実行</strong>
+                    <pre><code>python main.py</code></pre>
+                </li>
+            </ol>
+
+            <h3>コードのポイント解説</h3>
+
+            <div class="card danger-card">
+                <h4>🛡️ 安全制限のチェック (voice_chat.py)</h4>
+                <p><strong>最も重要な部分</strong>: 毎ターン開始前に安全制限をチェック</p>
+                <pre><code>def _check_safety_limits(self) -> tuple[bool, Optional[str]]:
+    # ターン数制限
+    if self.turn_count >= settings.MAX_CONVERSATION_TURNS:
+        return False, f"最大ターン数（{settings.MAX_CONVERSATION_TURNS}）に到達しました"
+
+    # 連続エラー制限
+    if self.consecutive_errors >= settings.MAX_CONSECUTIVE_ERRORS:
+        return False, f"連続エラーが{settings.MAX_CONSECUTIVE_ERRORS}回発生しました"
+
+    # セッション時間制限
+    if self.session_start_time:
+        elapsed = time.time() - self.session_start_time
+        if elapsed > settings.MAX_SESSION_DURATION:
+            return False, f"最大セッション時間を超過しました"
+
+    return True, None</code></pre>
+                <p style="margin-top: 1rem; color: var(--error-red);"><strong>注目:</strong> 3つの制限のどれか1つでも超えたら即座に停止</p>
+            </div>
+
+            <div class="card info-card">
+                <h4>🔄 対話ループの構造</h4>
+                <pre><code>while True:
+    # 1. 安全制限チェック（最初に必ず実行）
+    can_continue, stop_reason = self._check_safety_limits()
+    if not can_continue:
+        break
+
+    # 2. 音声認識（再試行機能付き）
+    success, user_text = self.recognizer.recognize_once()
+
+    # 3. 終了コマンドチェック
+    if self._is_exit_command(user_text):
+        break
+
+    # 4. エージェント処理
+    assistant_response = await self.session.send_message(user_text)
+
+    # 5. 音声合成
+    self.synthesizer.speak(assistant_response)
+
+    # 6. ターン数インクリメント
+    self.turn_count += 1</code></pre>
+            </div>
+
+            <div class="card success-card">
+                <h4>🎙️ 音声エージェントのプロンプト</h4>
+                <p>音声対話に特化したシステムプロンプトを設定</p>
+                <pre><code>VOICE_AGENT_INSTRUCTIONS = """
+あなたは親しみやすく自然な音声対話アシスタントです。
+
+## 対話スタイル
+- 音声での読み上げに適した、自然で流れるような文章で回答する
+- 長すぎる回答は避け、要点を簡潔に伝える
+- マークダウン記法やコードブロックは使用しない（音声には不向き）
+- 箇条書きは「1つ目は...、2つ目は...」のように音声で分かりやすく表現する
+"""</code></pre>
+                <p style="margin-top: 1rem;"><strong>注目:</strong> テキストチャットと音声対話でプロンプトを変える必要がある</p>
+            </div>
+        </section>
+
+        <!-- NEXT STEP セクション -->
+        <section id="nextstep">
+            <h2>🚀 NEXT STEP - 実務で追加が必要なこと</h2>
+
+            <div class="card-grid">
+                <div class="card danger-card">
+                    <h4>❗ 認証・セキュリティ</h4>
+                    <ul>
+                        <li>APIキーの安全な管理</li>
+                        <li>ユーザー認証</li>
+                        <li>音声データの暗号化</li>
+                    </ul>
+                </div>
+
+                <div class="card danger-card">
+                    <h4>❗ 音声品質の調整</h4>
+                    <ul>
+                        <li>ノイズ除去</li>
+                        <li>話者識別</li>
+                        <li>方言・アクセント対応</li>
+                    </ul>
+                </div>
+
+                <div class="card warning-card">
+                    <h4>⚠️ ユーザー体験向上</h4>
+                    <ul>
+                        <li>待機中のフィードバック音</li>
+                        <li>割り込み検出</li>
+                        <li>感情認識</li>
+                    </ul>
+                </div>
+
+                <div class="card warning-card">
+                    <h4>⚠️ 運用監視</h4>
+                    <ul>
+                        <li>対話ログの保存</li>
+                        <li>エラー率のモニタリング</li>
+                        <li>ユーザー満足度の計測</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 2rem; text-align: center; background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 255, 0.1)); border: 2px solid var(--success-green);">
+                <h3 style="color: var(--white); margin-bottom: 1rem;">🎯 持ち帰りメッセージ</h3>
+                <p style="font-size: 1.3rem; color: var(--white);">
+                    「音声エージェントは<strong style="color: var(--success-green);">暴走防止の設計</strong>が必須。<br>
+                    MAX_TURNS、タイムアウト、エラー上限は<br>
+                    <strong style="color: var(--neon-cyan);">最初から組み込む</strong>」
+                </p>
+            </div>
+        </section>
+
+        <!-- Phase 3 機能 -->
+        <section id="phase3">
+            <h2>🆕 Phase 3 拡張機能</h2>
+            <p>本システムにはPhase 3として以下の拡張機能が実装されています：</p>
+
+            <div class="card-grid">
+                <div class="card">
+                    <h4>📝 コンテキスト管理</h4>
+                    <p>会話から重要な情報を自動抽出し、後続の会話で活用</p>
+                    <code>tools/context_manager.py</code>
+                </div>
+                <div class="card">
+                    <h4>📋 会話要約</h4>
+                    <p>「要約して」と言うと会話の要点をまとめて読み上げ</p>
+                    <code>tools/conversation_summarizer.py</code>
+                </div>
+                <div class="card">
+                    <h4>🎤 音声プロファイル</h4>
+                    <p>複数の声質を切り替え可能（穏やか、元気、落ち着いた男性など）</p>
+                    <code>config/voice_profiles.py</code>
+                </div>
+                <div class="card">
+                    <h4>⚡ 話速調整</h4>
+                    <p>「速く」「ゆっくり」で話速をリアルタイム変更</p>
+                    <code>voice_chat.py</code>
+                </div>
+            </div>
+        </section>
+
+        <!-- 関連リンク -->
+        <section>
+            <h2>📚 関連リソース</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h4>📝 確認クイズ</h4>
+                    <p>理解度をチェック</p>
+                    <a href="../question/02_azure-voice-chatbot_quiz.html" style="color: var(--success-green);">問題を解く →</a>
+                </div>
+                <div class="card">
+                    <h4>✅ 解答・解説</h4>
+                    <p>詳細な解説を確認</p>
+                    <a href="../answer/02_azure-voice-chatbot_answer.html" style="color: var(--success-green);">解答を見る →</a>
+                </div>
+            </div>
+
+            <a href="../20251202_Azure_AI_Agent_ハンズオン.html" class="back-link">← メイン講義に戻る</a>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 SB C&S株式会社 - Azure AI Agentハンズオン</p>
+    </footer>
+</body>
+</html>
