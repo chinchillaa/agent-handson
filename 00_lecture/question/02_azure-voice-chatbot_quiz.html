@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure Voice Chatbot - 理解度確認問題</title>
+    <style>
+        :root {
+            --primary-blue: #0066ff;
+            --neon-cyan: #00ffff;
+            --dark-bg: #1e1e1e;
+            --darker-bg: #121212;
+            --card-bg: #2a2a2a;
+            --card-bg-light: #333333;
+            --success-green: #00ff88;
+            --warning-orange: #ffaa00;
+            --error-red: #ff4466;
+            --text-light: #ffffff;
+            --text-muted: #b0b0b0;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DejaVu Sans', 'Noto Sans JP', sans-serif;
+            line-height: 1.8;
+            color: var(--text-light);
+            background: var(--dark-bg);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
+            padding: 3rem 2rem;
+            text-align: center;
+            border-bottom: 2px solid var(--primary-blue);
+            position: relative;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            position: relative;
+        }
+
+        .meta-item {
+            background: rgba(0, 102, 255, 0.2);
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--primary-blue);
+            font-size: 0.9rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--neon-cyan);
+            margin: 3rem 0 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+        }
+
+        .question-number {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-blue), var(--neon-cyan));
+            color: var(--dark-bg);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+        }
+
+        .choices {
+            list-style: none;
+        }
+
+        .choices li {
+            background: var(--card-bg-light);
+            padding: 1rem 1.5rem;
+            margin-bottom: 0.8rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .choices li:hover {
+            background: rgba(0, 102, 255, 0.2);
+            border-color: var(--primary-blue);
+        }
+
+        .choice-label {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: var(--primary-blue);
+            color: var(--white);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 1rem;
+            font-weight: bold;
+        }
+
+        .blank-answer {
+            background: var(--card-bg-light);
+            border: 2px dashed var(--primary-blue);
+            padding: 1rem;
+            border-radius: 10px;
+            min-height: 100px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .category-tag {
+            display: inline-block;
+            background: rgba(0, 255, 255, 0.1);
+            color: var(--neon-cyan);
+            padding: 0.2rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-left: 1rem;
+        }
+
+        .difficulty {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        .difficulty-basic {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--success-green);
+        }
+
+        .difficulty-intermediate {
+            background: rgba(255, 170, 0, 0.2);
+            color: var(--warning-orange);
+        }
+
+        .difficulty-advanced {
+            background: rgba(255, 68, 102, 0.2);
+            color: var(--error-red);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+            color: var(--text-muted);
+        }
+
+        .answer-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary-blue), rgba(0, 102, 255, 0.8));
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: 1px solid var(--neon-cyan);
+        }
+
+        .answer-link:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        code {
+            background: var(--darker-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            color: var(--neon-cyan);
+        }
+
+        pre {
+            background: var(--darker-bg);
+            padding: 1rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid rgba(0, 102, 255, 0.3);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎙️ Azure Voice Chatbot</h1>
+        <p>02_azure-voice-chatbot 理解度確認問題</p>
+        <div class="meta-info">
+            <span class="meta-item">全15問</span>
+            <span class="meta-item">目安時間: 30分</span>
+            <span class="meta-item">対象: 開発者向け</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- セクション1: アーキテクチャ -->
+        <h2 class="section-title">📐 アーキテクチャ・処理フロー</h2>
+
+        <div class="question-card">
+            <span class="question-number">Q1</span>
+            <span class="category-tag">アーキテクチャ</span>
+            <span class="difficulty difficulty-basic">基礎</span>
+            <p class="question-text">
+                Azure Voice Chatbotの音声対話における処理フローとして正しい順序を選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>Text-to-Speech → エージェント処理 → Speech-to-Text</li>
+                <li><span class="choice-label">B</span>Speech-to-Text → Text-to-Speech → エージェント処理</li>
+                <li><span class="choice-label">C</span>Speech-to-Text → エージェント処理 → Text-to-Speech</li>
+                <li><span class="choice-label">D</span>エージェント処理 → Speech-to-Text → Text-to-Speech</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q2</span>
+            <span class="category-tag">アーキテクチャ</span>
+            <span class="difficulty difficulty-intermediate">応用</span>
+            <p class="question-text">
+                本システムで使用されているAzureサービスの組み合わせとして正しいものを選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>Azure Speech Service + Azure Cognitive Services</li>
+                <li><span class="choice-label">B</span>Azure Speech Service + Azure OpenAI Service</li>
+                <li><span class="choice-label">C</span>Azure Bot Service + Azure OpenAI Service</li>
+                <li><span class="choice-label">D</span>Azure Functions + Azure Speech Service</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q3</span>
+            <span class="category-tag">アーキテクチャ</span>
+            <span class="difficulty difficulty-advanced">発展</span>
+            <p class="question-text">
+                マルチターン対話において、Agent Frameworkの<code>thread</code>機構がどのようにコンテキスト（会話履歴）を管理しているか説明してください。
+            </p>
+            <div class="blank-answer">解答欄（記述式）</div>
+        </div>
+
+        <!-- セクション2: 音声処理 -->
+        <h2 class="section-title">🎤 音声処理（Speech Service）</h2>
+
+        <div class="question-card">
+            <span class="question-number">Q4</span>
+            <span class="category-tag">音声処理</span>
+            <span class="difficulty difficulty-basic">基礎</span>
+            <p class="question-text">
+                <code>SpeechRecognizer</code>クラスの<code>recognize_once()</code>メソッドが返す値の型として正しいものを選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>str（認識されたテキスト）</li>
+                <li><span class="choice-label">B</span>bool（成功/失敗）</li>
+                <li><span class="choice-label">C</span>tuple[bool, str]（成功フラグ, テキストまたはエラー）</li>
+                <li><span class="choice-label">D</span>dict（認識結果の詳細情報）</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q5</span>
+            <span class="category-tag">音声処理</span>
+            <span class="difficulty difficulty-intermediate">応用</span>
+            <p class="question-text">
+                <code>SpeechSynthesizer</code>クラスの<code>speak_with_options()</code>メソッドで、話速（rate）パラメータの有効な範囲を選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>0.1 ～ 3.0</li>
+                <li><span class="choice-label">B</span>0.5 ～ 2.0</li>
+                <li><span class="choice-label">C</span>1.0 ～ 5.0</li>
+                <li><span class="choice-label">D</span>-1.0 ～ 1.0</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q6</span>
+            <span class="category-tag">音声処理</span>
+            <span class="difficulty difficulty-intermediate">応用</span>
+            <p class="question-text">
+                Text-to-Speechで話速やピッチを動的に制御するために使用される技術/形式の名称を選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>JSON（JavaScript Object Notation）</li>
+                <li><span class="choice-label">B</span>SSML（Speech Synthesis Markup Language）</li>
+                <li><span class="choice-label">C</span>YAML（YAML Ain't Markup Language）</li>
+                <li><span class="choice-label">D</span>XML-RPC</li>
+            </ul>
+        </div>
+
+        <!-- セクション3: 音声プロファイル -->
+        <h2 class="section-title">🗣️ 音声プロファイル</h2>
+
+        <div class="question-card">
+            <span class="question-number">Q7</span>
+            <span class="category-tag">音声プロファイル</span>
+            <span class="difficulty difficulty-basic">基礎</span>
+            <p class="question-text">
+                本システムでデフォルトの音声として設定されている日本語Neural Voiceの名前を選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>ja-JP-KeitaNeural（けいた）</li>
+                <li><span class="choice-label">B</span>ja-JP-NanamiNeural（ななみ）</li>
+                <li><span class="choice-label">C</span>ja-JP-MayuNeural（まゆ）</li>
+                <li><span class="choice-label">D</span>ja-JP-DaichiNeural（だいち）</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q8</span>
+            <span class="category-tag">音声プロファイル</span>
+            <span class="difficulty difficulty-intermediate">応用</span>
+            <p class="question-text">
+                <code>VoiceProfile</code>データクラスに含まれる属性として、正しくないものを選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>speaking_rate（話速）</li>
+                <li><span class="choice-label">B</span>pitch（ピッチ）</li>
+                <li><span class="choice-label">C</span>emotion（感情）</li>
+                <li><span class="choice-label">D</span>style（スタイル）</li>
+            </ul>
+        </div>
+
+        <!-- セクション4: エージェント・セッション -->
+        <h2 class="section-title">🤖 エージェント・セッション管理</h2>
+
+        <div class="question-card">
+            <span class="question-number">Q9</span>
+            <span class="category-tag">エージェント</span>
+            <span class="difficulty difficulty-basic">基礎</span>
+            <p class="question-text">
+                <code>VoiceAgentSession</code>クラスの主な役割として正しいものを選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>音声認識処理を管理する</li>
+                <li><span class="choice-label">B</span>マルチターン対話のセッションと会話履歴を管理する</li>
+                <li><span class="choice-label">C</span>音声合成処理を管理する</li>
+                <li><span class="choice-label">D</span>Azure認証トークンを管理する</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q10</span>
+            <span class="category-tag">エージェント</span>
+            <span class="difficulty difficulty-advanced">発展</span>
+            <p class="question-text">
+                音声対話エージェントのシステムプロンプト（VOICE_AGENT_INSTRUCTIONS）において、「マークダウンやコードブロックを使用しない」という指示がある理由を記述してください。
+            </p>
+            <div class="blank-answer">解答欄（記述式）</div>
+        </div>
+
+        <!-- セクション5: 安全機構 -->
+        <h2 class="section-title">🛡️ 安全機構・エラーハンドリング</h2>
+
+        <div class="question-card">
+            <span class="question-number">Q11</span>
+            <span class="category-tag">安全機構</span>
+            <span class="difficulty difficulty-basic">基礎</span>
+            <p class="question-text">
+                <code>VoiceChat</code>クラスに実装されている安全制限として、正しくないものを選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>MAX_CONVERSATION_TURNS（最大ターン数制限）</li>
+                <li><span class="choice-label">B</span>MAX_CONSECUTIVE_ERRORS（最大連続エラー数制限）</li>
+                <li><span class="choice-label">C</span>MAX_SESSION_DURATION（セッション時間制限）</li>
+                <li><span class="choice-label">D</span>MAX_TOKEN_USAGE（最大トークン使用量制限）</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q12</span>
+            <span class="category-tag">安全機構</span>
+            <span class="difficulty difficulty-intermediate">応用</span>
+            <p class="question-text">
+                音声認識が失敗した場合の自動再試行回数のデフォルト値を選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>1回</li>
+                <li><span class="choice-label">B</span>3回</li>
+                <li><span class="choice-label">C</span>5回</li>
+                <li><span class="choice-label">D</span>無制限</li>
+            </ul>
+        </div>
+
+        <!-- セクション6: Phase 3機能 -->
+        <h2 class="section-title">✨ Phase 3 拡張機能</h2>
+
+        <div class="question-card">
+            <span class="question-number">Q13</span>
+            <span class="category-tag">Phase 3</span>
+            <span class="difficulty difficulty-basic">基礎</span>
+            <p class="question-text">
+                音声コマンド「要約して」を発話した場合に実行される処理として正しいものを選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>音声プロファイルの切り替え</li>
+                <li><span class="choice-label">B</span>話速の調整</li>
+                <li><span class="choice-label">C</span>会話履歴の要約生成</li>
+                <li><span class="choice-label">D</span>セッションの終了</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q14</span>
+            <span class="category-tag">Phase 3</span>
+            <span class="difficulty difficulty-intermediate">応用</span>
+            <p class="question-text">
+                <code>ContextManager</code>クラスが会話履歴から自動抽出する情報として、正しいものをすべて選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>ユーザー名</li>
+                <li><span class="choice-label">B</span>話題キーワード</li>
+                <li><span class="choice-label">C</span>ユーザーの感情</li>
+                <li><span class="choice-label">D</span>GPSの位置情報</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q15</span>
+            <span class="category-tag">Phase 3</span>
+            <span class="difficulty difficulty-advanced">発展</span>
+            <p class="question-text">
+                本システムの実装フェーズ（Phase 1～4）において、各フェーズで実装された主要機能を簡潔に説明してください。
+            </p>
+            <div class="blank-answer">解答欄（記述式）</div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="02_azure-voice-chatbot_answer.html" class="answer-link">📝 解答を確認する</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Azure Voice Chatbot - 理解度確認問題</p>
+        <p>02_azure-voice-chatbot | Azure AI Agent ハンズオン</p>
+    </footer>
+</body>
+</html>

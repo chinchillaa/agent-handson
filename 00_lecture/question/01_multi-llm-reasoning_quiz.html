@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マルチLLM推論システム - 理解度確認問題</title>
+    <style>
+        :root {
+            --primary-blue: #0066ff;
+            --neon-cyan: #00ffff;
+            --dark-bg: #1e1e1e;
+            --darker-bg: #121212;
+            --card-bg: #2a2a2a;
+            --card-bg-light: #333333;
+            --success-green: #00ff88;
+            --warning-orange: #ffaa00;
+            --error-red: #ff4466;
+            --text-light: #ffffff;
+            --text-muted: #b0b0b0;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DejaVu Sans', 'Noto Sans JP', sans-serif;
+            line-height: 1.8;
+            color: var(--text-light);
+            background: var(--dark-bg);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
+            padding: 3rem 2rem;
+            text-align: center;
+            border-bottom: 2px solid var(--primary-blue);
+            position: relative;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            position: relative;
+        }
+
+        .meta-item {
+            background: rgba(0, 102, 255, 0.2);
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--primary-blue);
+            font-size: 0.9rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--neon-cyan);
+            margin: 3rem 0 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+        }
+
+        .question-number {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-blue), var(--neon-cyan));
+            color: var(--dark-bg);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+        }
+
+        .choices {
+            list-style: none;
+        }
+
+        .choices li {
+            background: var(--card-bg-light);
+            padding: 1rem 1.5rem;
+            margin-bottom: 0.8rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .choices li:hover {
+            background: rgba(0, 102, 255, 0.2);
+            border-color: var(--primary-blue);
+        }
+
+        .choice-label {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: var(--primary-blue);
+            color: var(--white);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 1rem;
+            font-weight: bold;
+        }
+
+        .blank-answer {
+            background: var(--card-bg-light);
+            border: 2px dashed var(--primary-blue);
+            padding: 1rem;
+            border-radius: 10px;
+            min-height: 100px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .category-tag {
+            display: inline-block;
+            background: rgba(0, 255, 255, 0.1);
+            color: var(--neon-cyan);
+            padding: 0.2rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-left: 1rem;
+        }
+
+        .difficulty {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        .difficulty-basic {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--success-green);
+        }
+
+        .difficulty-intermediate {
+            background: rgba(255, 170, 0, 0.2);
+            color: var(--warning-orange);
+        }
+
+        .difficulty-advanced {
+            background: rgba(255, 68, 102, 0.2);
+            color: var(--error-red);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+            color: var(--text-muted);
+        }
+
+        .answer-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary-blue), rgba(0, 102, 255, 0.8));
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: 1px solid var(--neon-cyan);
+        }
+
+        .answer-link:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        code {
+            background: var(--darker-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            color: var(--neon-cyan);
+        }
+
+        pre {
+            background: var(--darker-bg);
+            padding: 1rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid rgba(0, 102, 255, 0.3);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>マルチLLM推論システム</h1>
+        <p>01_multi-llm-reasoning 理解度確認問題</p>
+        <div class="meta-info">
+            <span class="meta-item">全15問</span>
+            <span class="meta-item">目安時間: 30分</span>
+            <span class="meta-item">対象: 開発者向け</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- セクション1: アーキテクチャ -->
+        <h2 class="section-title">📐 アーキテクチャ設計</h2>
+
+        <div class="question-card">
+            <span class="question-number">Q1</span>
+            <span class="category-tag">アーキテクチャ</span>
+            <span class="difficulty difficulty-basic">基礎</span>
+            <p class="question-text">
+                マルチLLM推論システムでは、4つのエージェントが順次処理を行います。正しい実行順序を選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>Researcher → Coordinator → Analyzer → Summarizer</li>
+                <li><span class="choice-label">B</span>Coordinator → Researcher → Analyzer → Summarizer</li>
+                <li><span class="choice-label">C</span>Coordinator → Analyzer → Researcher → Summarizer</li>
+                <li><span class="choice-label">D</span>Summarizer → Coordinator → Researcher → Analyzer</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q2</span>
+            <span class="category-tag">アーキテクチャ</span>
+            <span class="difficulty difficulty-intermediate">応用</span>
+            <p class="question-text">
+                ResearcherエージェントにはGPT-5-miniが使用されていますが、他の3エージェント（Coordinator, Analyzer, Summarizer）にはGPT-5が使用されています。この設計上の理由として最も適切なものを選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>GPT-5-miniの方が処理速度が速いため</li>
+                <li><span class="choice-label">B</span>情報収集タスクは複雑な推論を必要としないためコスト効率を重視</li>
+                <li><span class="choice-label">C</span>GPT-5-miniの方がWeb検索ツールとの相性が良いため</li>
+                <li><span class="choice-label">D</span>GPT-5はResearcherでは利用できないため</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q3</span>
+            <span class="category-tag">アーキテクチャ</span>
+            <span class="difficulty difficulty-advanced">発展</span>
+            <p class="question-text">
+                ワークフロー初期化時に4つのエージェントが「並列」で作成されますが、実行自体は「順次」で行われます。この設計の利点を記述してください。
+            </p>
+            <div class="blank-answer">解答欄（記述式）</div>
+        </div>
+
+        <!-- セクション2: エージェント設計 -->
+        <h2 class="section-title">🤖 エージェント設計</h2>
+
+        <div class="question-card">
+            <span class="question-number">Q4</span>
+            <span class="category-tag">エージェント</span>
+            <span class="difficulty difficulty-basic">基礎</span>
+            <p class="question-text">
+                Coordinatorエージェントの主な役割として正しいものを選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>Web検索を実行して情報を収集する</li>
+                <li><span class="choice-label">B</span>ユーザーの質問を分析し、調査計画を立案する</li>
+                <li><span class="choice-label">C</span>データを統計的に分析する</li>
+                <li><span class="choice-label">D</span>最終回答をMarkdown形式で整形する</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q5</span>
+            <span class="category-tag">エージェント</span>
+            <span class="difficulty difficulty-intermediate">応用</span>
+            <p class="question-text">
+                Analyzerエージェントに搭載されている <code>HostedCodeInterpreterTool</code> の主な用途として適切なものを選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>ユーザーのコードをレビューする</li>
+                <li><span class="choice-label">B</span>コード実行やグラフ作成を行う</li>
+                <li><span class="choice-label">C</span>Pythonコードを他の言語に変換する</li>
+                <li><span class="choice-label">D</span>セキュリティ脆弱性をスキャンする</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q6</span>
+            <span class="category-tag">エージェント</span>
+            <span class="difficulty difficulty-advanced">発展</span>
+            <p class="question-text">
+                Summarizerエージェントが複数のフェーズからの<strong>矛盾する情報</strong>を受け取った場合、推奨される処理方法として最適なものを選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>両論を併記し、根拠や信頼度を明示した上で、ユーザーが判断できるようにする</li>
+                <li><span class="choice-label">B</span>システムが最も信頼度の高い情報を判断し、単一の見方で回答を統一する</li>
+                <li><span class="choice-label">C</span>矛盾する情報は削除し、一貫性のある情報のみを提示する</li>
+                <li><span class="choice-label">D</span>エラーとして処理を中断し、ユーザーに再実行を求める</li>
+            </ul>
+        </div>
+
+        <!-- セクション3: ツール設計 -->
+        <h2 class="section-title">🔧 ツール設計</h2>
+
+        <div class="question-card">
+            <span class="question-number">Q7</span>
+            <span class="category-tag">ツール</span>
+            <span class="difficulty difficulty-basic">基礎</span>
+            <p class="question-text">
+                本システムで実装されているカスタムツールの総数として正しいものを選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>10個</li>
+                <li><span class="choice-label">B</span>13個</li>
+                <li><span class="choice-label">C</span>17個</li>
+                <li><span class="choice-label">D</span>20個</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q8</span>
+            <span class="category-tag">ツール</span>
+            <span class="difficulty difficulty-intermediate">応用</span>
+            <p class="question-text">
+                <code>calculate_statistics</code> ツールが計算する統計情報として含まれないものを選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>平均値（mean）</li>
+                <li><span class="choice-label">B</span>中央値（median）</li>
+                <li><span class="choice-label">C</span>標準偏差（std）</li>
+                <li><span class="choice-label">D</span>相関係数（correlation）</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q9</span>
+            <span class="category-tag">ツール</span>
+            <span class="difficulty difficulty-intermediate">応用</span>
+            <p class="question-text">
+                テキスト整形ツールの <code>add_metadata</code> 関数は、コンテンツにどのような形式でメタデータを追加しますか？
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>JSON形式でコンテンツの末尾に追加</li>
+                <li><span class="choice-label">B</span>YAML front matter形式でコンテンツの先頭に追加</li>
+                <li><span class="choice-label">C</span>HTMLコメント形式でコンテンツ内に埋め込み</li>
+                <li><span class="choice-label">D</span>別ファイルとして出力</li>
+            </ul>
+        </div>
+
+        <!-- セクション4: ワークフロー -->
+        <h2 class="section-title">🔄 ワークフロー管理</h2>
+
+        <div class="question-card">
+            <span class="question-number">Q10</span>
+            <span class="category-tag">ワークフロー</span>
+            <span class="difficulty difficulty-basic">基礎</span>
+            <p class="question-text">
+                <code>MultiAgentWorkflow</code> クラスの <code>run()</code> メソッドが返す結果辞書に含まれる項目として、正しくないものを選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>final_answer</li>
+                <li><span class="choice-label">B</span>execution_time</li>
+                <li><span class="choice-label">C</span>agent_outputs</li>
+                <li><span class="choice-label">D</span>token_usage</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q11</span>
+            <span class="category-tag">ワークフロー</span>
+            <span class="difficulty difficulty-advanced">発展</span>
+            <p class="question-text">
+                ワークフローにおいて、エージェント間でデータを受け渡す際のプロンプト構築方法の利点と潜在的な課題を記述してください。
+            </p>
+            <div class="blank-answer">解答欄（記述式）</div>
+        </div>
+
+        <!-- セクション5: 認証・設定 -->
+        <h2 class="section-title">🔐 認証・設定管理</h2>
+
+        <div class="question-card">
+            <span class="question-number">Q12</span>
+            <span class="category-tag">認証</span>
+            <span class="difficulty difficulty-basic">基礎</span>
+            <p class="question-text">
+                Azure OpenAI Serviceへの認証方式として、本システムが採用しているものを選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>APIキー認証</li>
+                <li><span class="choice-label">B</span>Azure CLI認証</li>
+                <li><span class="choice-label">C</span>OAuth 2.0認証</li>
+                <li><span class="choice-label">D</span>証明書認証</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q13</span>
+            <span class="category-tag">設定</span>
+            <span class="difficulty difficulty-intermediate">応用</span>
+            <p class="question-text">
+                <code>Settings</code> クラスの <code>get_deployment_name()</code> メソッドに <code>"gpt5"</code> を渡した場合、どの環境変数の値が返されますか？
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>AZURE_OPENAI_ENDPOINT</li>
+                <li><span class="choice-label">B</span>AZURE_OPENAI_DEPLOYMENT_GPT5</li>
+                <li><span class="choice-label">C</span>AZURE_OPENAI_API_VERSION</li>
+                <li><span class="choice-label">D</span>GPT5_MAX_TOKENS</li>
+            </ul>
+        </div>
+
+        <!-- セクション6: CLI・テスト -->
+        <h2 class="section-title">💻 CLI・テスト</h2>
+
+        <div class="question-card">
+            <span class="question-number">Q14</span>
+            <span class="category-tag">CLI</span>
+            <span class="difficulty difficulty-basic">基礎</span>
+            <p class="question-text">
+                <code>main.py</code> をコマンドライン引数なしで実行した場合の動作として正しいものを選んでください。
+            </p>
+            <ul class="choices">
+                <li><span class="choice-label">A</span>エラーが発生して終了する</li>
+                <li><span class="choice-label">B</span>ヘルプメッセージが表示される</li>
+                <li><span class="choice-label">C</span>インタラクティブモードで質問入力を待機する</li>
+                <li><span class="choice-label">D</span>デフォルトの質問で実行される</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <span class="question-number">Q15</span>
+            <span class="category-tag">テスト</span>
+            <span class="difficulty difficulty-advanced">発展</span>
+            <p class="question-text">
+                本システムのテストにおいて、外部APIを実際に呼び出さずにテストを実行できる理由と、その設計上のメリットを記述してください。
+            </p>
+            <div class="blank-answer">解答欄（記述式）</div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="01_multi-llm-reasoning_answer.html" class="answer-link">📝 解答を確認する</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>マルチLLM推論システム - 理解度確認問題</p>
+        <p>01_multi-llm-reasoning | Azure AI Agent ハンズオン</p>
+    </footer>
+</body>
+</html>

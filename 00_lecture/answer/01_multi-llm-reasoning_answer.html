@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マルチLLM推論システム - 解答・解説</title>
+    <style>
+        :root {
+            --primary-blue: #0066ff;
+            --neon-cyan: #00ffff;
+            --dark-bg: #1e1e1e;
+            --darker-bg: #121212;
+            --card-bg: #2a2a2a;
+            --card-bg-light: #333333;
+            --success-green: #00ff88;
+            --warning-orange: #ffaa00;
+            --error-red: #ff4466;
+            --text-light: #ffffff;
+            --text-muted: #b0b0b0;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DejaVu Sans', 'Noto Sans JP', sans-serif;
+            line-height: 1.8;
+            color: var(--text-light);
+            background: var(--dark-bg);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
+            padding: 3rem 2rem;
+            text-align: center;
+            border-bottom: 2px solid var(--success-green);
+            position: relative;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--success-green), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--neon-cyan);
+            margin: 3rem 0 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .answer-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .question-number {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-blue), var(--neon-cyan));
+            color: var(--dark-bg);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+            padding: 1rem;
+            background: var(--darker-bg);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .correct-answer {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid var(--success-green);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .correct-answer::before {
+            content: '✓';
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: var(--success-green);
+            color: var(--dark-bg);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+        }
+
+        .explanation {
+            background: var(--card-bg-light);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .explanation-title {
+            color: var(--neon-cyan);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .explanation-title::before {
+            content: '💡';
+        }
+
+        .key-point {
+            background: rgba(0, 102, 255, 0.1);
+            border-left: 4px solid var(--primary-blue);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .key-point-title {
+            color: var(--primary-blue);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+            color: var(--text-muted);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--card-bg-light), var(--card-bg));
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: 1px solid var(--primary-blue);
+        }
+
+        .back-link:hover {
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        code {
+            background: var(--darker-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            color: var(--neon-cyan);
+        }
+
+        pre {
+            background: var(--darker-bg);
+            padding: 1rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid rgba(0, 102, 255, 0.3);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        ul li {
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .category-tag {
+            display: inline-block;
+            background: rgba(0, 255, 255, 0.1);
+            color: var(--neon-cyan);
+            padding: 0.2rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-left: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>マルチLLM推論システム</h1>
+        <p>01_multi-llm-reasoning 解答・解説</p>
+    </header>
+
+    <div class="container">
+        <!-- セクション1: アーキテクチャ -->
+        <h2 class="section-title">📐 アーキテクチャ設計</h2>
+
+        <div class="answer-card">
+            <span class="question-number">Q1</span>
+            <span class="category-tag">アーキテクチャ</span>
+            <div class="question-text">
+                マルチLLM推論システムでは、4つのエージェントが順次処理を行います。正しい実行順序を選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: B</strong> Coordinator → Researcher → Analyzer → Summarizer
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p>4段階推論フローは以下の順序で設計されています：</p>
+                <ul>
+                    <li><strong>Phase 1 - Coordinator:</strong> ユーザーの質問を分析し、調査計画を立案</li>
+                    <li><strong>Phase 2 - Researcher:</strong> 計画に基づいてWeb検索で情報収集</li>
+                    <li><strong>Phase 3 - Analyzer:</strong> 収集した情報を多角的に分析</li>
+                    <li><strong>Phase 4 - Summarizer:</strong> 全出力を統合し、最終回答を生成</li>
+                </ul>
+                <div class="key-point">
+                    <div class="key-point-title">設計のポイント</div>
+                    <p>各フェーズの出力が次のフェーズの入力となる「パイプライン構造」により、複雑なタスクを段階的に処理し、最終的に高品質な回答を生成します。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q2</span>
+            <span class="category-tag">アーキテクチャ</span>
+            <div class="question-text">
+                ResearcherエージェントにはGPT-5-miniが使用されていますが、他の3エージェントにはGPT-5が使用されています。この設計上の理由を選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: B</strong> 情報収集タスクは複雑な推論を必要としないためコスト効率を重視
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p>モデル選択の設計思想は「タスクの複雑さに応じた最適化」です：</p>
+                <ul>
+                    <li><strong>GPT-5（高性能）:</strong> Coordinator（計画立案）、Analyzer（深い分析）、Summarizer（統合・整形）- 複雑な推論が必要</li>
+                    <li><strong>GPT-5-mini（コスト効率）:</strong> Researcher（情報収集）- Web検索結果の整理が主なタスクで、複雑な推論は不要</li>
+                </ul>
+                <div class="key-point">
+                    <div class="key-point-title">コスト見積もり参考</div>
+                    <p>GPT-5-miniは入力$0.00025/1K、出力$0.00200/1K と、GPT-5（入力$0.00125/1K、出力$0.01000/1K）と比較して大幅にコストを削減できます。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q3</span>
+            <span class="category-tag">アーキテクチャ</span>
+            <div class="question-text">
+                ワークフロー初期化時に4つのエージェントが「並列」で作成されますが、実行自体は「順次」で行われます。この設計の利点を記述してください。
+            </div>
+            <div class="correct-answer">
+                <strong>模範解答</strong>
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解答例</div>
+                <p><strong>並列初期化の利点：</strong></p>
+                <ul>
+                    <li>4つのエージェント作成を同時に行うことで、初期化時間を大幅に短縮</li>
+                    <li>各エージェントはAzure OpenAIへの接続確立が必要なため、並列化の効果が大きい</li>
+                    <li>asyncio.gather()を使用した非同期並列処理により、I/O待ち時間を最小化</li>
+                </ul>
+                <p><strong>順次実行の必要性：</strong></p>
+                <ul>
+                    <li>各エージェントの出力が次のエージェントの入力となるため、データ依存関係が存在</li>
+                    <li>Coordinatorの調査計画がないとResearcherは何を調べるべきか分からない</li>
+                    <li>分析前に情報収集が完了している必要がある</li>
+                </ul>
+                <div class="key-point">
+                    <div class="key-point-title">設計パターン</div>
+                    <p>「初期化は並列、実行は順次」というパターンは、依存関係のあるパイプライン処理において、起動時間を最適化しつつデータの整合性を保つ効果的な設計です。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- セクション2: エージェント設計 -->
+        <h2 class="section-title">🤖 エージェント設計</h2>
+
+        <div class="answer-card">
+            <span class="question-number">Q4</span>
+            <span class="category-tag">エージェント</span>
+            <div class="question-text">
+                Coordinatorエージェントの主な役割として正しいものを選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: B</strong> ユーザーの質問を分析し、調査計画を立案する
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p>Coordinatorは「タスクコーディネーター」として、以下の出力フォーマットで計画を提示します：</p>
+                <ul>
+                    <li>【質問の理解】- ユーザーが知りたいことの核心</li>
+                    <li>【必要な情報】- 重要度付きの情報リスト</li>
+                    <li>【分析の方向性】- 観点とポイント</li>
+                    <li>【次のステップへの指示】- Researcherへの具体的指示</li>
+                </ul>
+                <p>他の選択肢はそれぞれ別のエージェントの役割です（A: Researcher、C: Analyzer、D: Summarizer）。</p>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q5</span>
+            <span class="category-tag">エージェント</span>
+            <div class="question-text">
+                Analyzerエージェントに搭載されている <code>HostedCodeInterpreterTool</code> の主な用途を選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: B</strong> コード実行やグラフ作成を行う
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p><code>HostedCodeInterpreterTool</code>は、Microsoft Agent Frameworkが提供するホスト型ツールで、以下の機能を提供します：</p>
+                <ul>
+                    <li>Pythonコードの実行（データ処理、計算）</li>
+                    <li>グラフ・チャートの作成（データ可視化）</li>
+                    <li>数値解析・統計処理</li>
+                </ul>
+                <p>Analyzerエージェントはこのツールを使用して、収集した情報の定量的分析や可視化を行います。</p>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q6</span>
+            <span class="category-tag">エージェント</span>
+            <div class="question-text">
+                Summarizerエージェントが複数のフェーズからの矛盾する情報を受け取った場合、推奨される処理方法を選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: A</strong> 両論を併記し、根拠や信頼度を明示した上で、ユーザーが判断できるようにする
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p>マルチLLM推論システムにおいて、エージェント間の矛盾が発生する場合があります：</p>
+                <ul>
+                    <li><strong>矛盾発生の原因:</strong> 複数のLLMが異なるコンテキストで推論を行うため、解釈の違いが生じる</li>
+                    <li><strong>推奨される処理:</strong> 矛盾を隠蔽せず、両方の見方を提示し、その根拠を示す</li>
+                    <li><strong>ユーザー価値:</strong> ユーザーがより深く検討でき、より良い判断を下すことができる</li>
+                </ul>
+                <p><strong>非推奨な処理:</strong></p>
+                <ul>
+                    <li>一方の意見を勝手に選ぶ（根拠不明な判断に見える）</li>
+                    <li>矛盾する情報を削除する（重要な観点の欠落）</li>
+                    <li>単に複数情報を列挙するだけ（ユーザーが判断しきれない）</li>
+                </ul>
+                <div class="key-point">
+                    <div class="key-point-title">透明性の原則</div>
+                    <p>マルチLLM推論の本質的な価値は「複数の視点から検討する」ことにあります。矛盾を適切に表現することが、システムの信頼性と価値を高めます。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- セクション3: ツール設計 -->
+        <h2 class="section-title">🔧 ツール設計</h2>
+
+        <div class="answer-card">
+            <span class="question-number">Q7</span>
+            <span class="category-tag">ツール</span>
+            <div class="question-text">
+                本システムで実装されているカスタムツールの総数として正しいものを選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: C</strong> 17個
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p>カスタムツールは3カテゴリに分類されます：</p>
+                <ul>
+                    <li><strong>Web検索支援ツール（4個）:</strong> extract_key_information, summarize_search_results, organize_information, validate_sources</li>
+                    <li><strong>データ分析ツール（5個）:</strong> calculate_statistics, compare_data, extract_numbers_from_text, analyze_trend, categorize_data</li>
+                    <li><strong>テキスト整形ツール（8個）:</strong> format_as_markdown, create_bullet_list, structure_as_json, create_summary_table, highlight_key_points, format_conclusion, clean_text, add_metadata</li>
+                </ul>
+                <p>合計: 4 + 5 + 8 = <strong>17個</strong></p>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q8</span>
+            <span class="category-tag">ツール</span>
+            <div class="question-text">
+                <code>calculate_statistics</code> ツールが計算する統計情報として含まれないものを選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: D</strong> 相関係数（correlation）
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p><code>calculate_statistics</code>ツールは単一のデータセットに対する基本統計量を計算します：</p>
+                <ul>
+                    <li>平均値（mean）</li>
+                    <li>中央値（median）</li>
+                    <li>標準偏差（std）</li>
+                    <li>最小値・最大値（min/max）</li>
+                    <li>データ数（count）</li>
+                </ul>
+                <p>相関係数は2つのデータセット間の関係を表す指標であり、単一データセットの統計量ではありません。2つのデータセットの比較には <code>compare_data</code> ツールを使用します。</p>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q9</span>
+            <span class="category-tag">ツール</span>
+            <div class="question-text">
+                テキスト整形ツールの <code>add_metadata</code> 関数は、どのような形式でメタデータを追加しますか？
+            </div>
+            <div class="correct-answer">
+                <strong>正解: B</strong> YAML front matter形式でコンテンツの先頭に追加
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p>YAML front matterは、Markdownファイルの先頭に配置されるメタデータ形式で、以下のような構造になります：</p>
+                <pre><code>---
+title: "記事タイトル"
+date: "2026-01-15"
+author: "作成者"
+---
+（本文コンテンツ）</code></pre>
+                <p>この形式は、静的サイトジェネレーター（Jekyll、Hugo等）やドキュメント管理システムで広く使用されており、人間が読みやすく、プログラムでもパースしやすい利点があります。</p>
+            </div>
+        </div>
+
+        <!-- セクション4: ワークフロー -->
+        <h2 class="section-title">🔄 ワークフロー管理</h2>
+
+        <div class="answer-card">
+            <span class="question-number">Q10</span>
+            <span class="category-tag">ワークフロー</span>
+            <div class="question-text">
+                <code>MultiAgentWorkflow</code> クラスの <code>run()</code> メソッドが返す結果辞書に含まれる項目として、正しくないものを選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: D</strong> token_usage
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p><code>run()</code>メソッドが返す結果辞書には以下の項目が含まれます：</p>
+                <ul>
+                    <li><strong>final_answer:</strong> Summarizerが生成した最終回答</li>
+                    <li><strong>execution_time:</strong> ワークフロー全体の実行時間</li>
+                    <li><strong>agent_outputs:</strong> 各エージェントの出力を格納した辞書</li>
+                    <li><strong>execution_history:</strong> 実行履歴・ログ情報</li>
+                </ul>
+                <p><code>token_usage</code>は現在の実装には含まれていません。トークン使用量の追跡は、コスト管理の観点から今後の拡張候補となる機能です。</p>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q11</span>
+            <span class="category-tag">ワークフロー</span>
+            <div class="question-text">
+                ワークフローにおいて、エージェント間でデータを受け渡す際のプロンプト構築方法の利点と潜在的な課題を記述してください。
+            </div>
+            <div class="correct-answer">
+                <strong>模範解答</strong>
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解答例</div>
+                <p><strong>利点：</strong></p>
+                <ul>
+                    <li><strong>透明性:</strong> 各フェーズの出力がそのまま次のプロンプトに含まれるため、処理の流れが追跡しやすい</li>
+                    <li><strong>柔軟性:</strong> プロンプトのテンプレートを変更するだけで、エージェント間の連携方法を調整可能</li>
+                    <li><strong>デバッグ容易性:</strong> 各段階の入出力が明示的に記録されるため、問題発生時の原因特定が容易</li>
+                    <li><strong>コンテキスト保持:</strong> 元の質問が全フェーズで参照可能なため、回答が質問から逸脱しにくい</li>
+                </ul>
+                <p><strong>潜在的な課題：</strong></p>
+                <ul>
+                    <li><strong>トークン増大:</strong> 後段のエージェントほど入力トークン数が増加し、コストと処理時間が増える</li>
+                    <li><strong>コンテキスト長制限:</strong> 非常に長い出力が累積すると、モデルのコンテキスト長を超える可能性</li>
+                    <li><strong>ノイズ伝播:</strong> 前段のエージェントの不正確な出力が後段に影響を与える</li>
+                    <li><strong>冗長性:</strong> 同じ情報が複数回含まれることでトークンの無駄遣いが発生</li>
+                </ul>
+                <div class="key-point">
+                    <div class="key-point-title">改善アイデア</div>
+                    <p>要約機能を挟んで前段出力を圧縮する、重要度に応じて情報を取捨選択するなどの対策が考えられます。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- セクション5: 認証・設定 -->
+        <h2 class="section-title">🔐 認証・設定管理</h2>
+
+        <div class="answer-card">
+            <span class="question-number">Q12</span>
+            <span class="category-tag">認証</span>
+            <div class="question-text">
+                Azure OpenAI Serviceへの認証方式として、本システムが採用しているものを選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: A</strong> APIキー認証（.env環境変数方式）
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p>本システムでは<strong>APIキー認証（.env環境変数方式）</strong>を採用しています：</p>
+                <ul>
+                    <li><strong>運用実装:</strong> .envファイルにAPIキーを記載し、<code>python-dotenv</code>で環境変数として読み込む</li>
+                    <li><strong>利便性:</strong> 設定ファイルでの一元管理が容易で、開発環境・本番環境での切り替えが簡単</li>
+                    <li><strong>実装シンプル:</strong> 環境変数からの直接読み込みで、複雑な認証フローが不要</li>
+                </ul>
+                <p>Azure CLI認証（AzureCliCredential）やマネージドID認証も技術的には対応可能ですが、本システムの開発・運用環境では、.env方式によるAPIキー認証が採用されています。</p>
+                <pre><code># .envファイルでの設定
+AZURE_OPENAI_API_KEY="your_api_key"
+AZURE_OPENAI_ENDPOINT="https://your-resource.openai.azure.com/"
+
+# 環境変数として読み込み
+from dotenv import load_dotenv
+load_dotenv()</code></pre>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q13</span>
+            <span class="category-tag">設定</span>
+            <div class="question-text">
+                <code>Settings</code> クラスの <code>get_deployment_name()</code> メソッドに <code>"gpt5"</code> を渡した場合、どの環境変数の値が返されますか？
+            </div>
+            <div class="correct-answer">
+                <strong>正解: B</strong> AZURE_OPENAI_DEPLOYMENT_GPT5
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p><code>get_deployment_name()</code>メソッドは、モデルタイプ文字列からデプロイメント名を取得するヘルパー関数です：</p>
+                <pre><code>@classmethod
+def get_deployment_name(cls, model_type: str) -> str:
+    if model_type == "gpt5":
+        return cls.AZURE_OPENAI_DEPLOYMENT_GPT5
+    elif model_type == "gpt5-mini":
+        return cls.AZURE_OPENAI_DEPLOYMENT_GPT5_MINI
+    else:
+        raise ValueError(f"Unknown model type: {model_type}")</code></pre>
+                <p>この設計により、コード内でのモデル指定を抽象化し、実際のデプロイメント名は環境変数で管理できます。</p>
+            </div>
+        </div>
+
+        <!-- セクション6: CLI・テスト -->
+        <h2 class="section-title">💻 CLI・テスト</h2>
+
+        <div class="answer-card">
+            <span class="question-number">Q14</span>
+            <span class="category-tag">CLI</span>
+            <div class="question-text">
+                <code>main.py</code> をコマンドライン引数なしで実行した場合の動作を選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: C</strong> インタラクティブモードで質問入力を待機する
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p><code>main.py</code>は2つの実行モードをサポートしています：</p>
+                <ul>
+                    <li><strong>コマンドライン引数モード:</strong> <code>python main.py "質問"</code> で直接質問を指定</li>
+                    <li><strong>インタラクティブモード:</strong> 引数なしで実行すると、ユーザーに質問入力を促す</li>
+                </ul>
+                <p>インタラクティブモードでは、バナー表示後に入力プロンプトが表示され、ユーザーの入力を待機します。これにより、スクリプトとしても対話的ツールとしても使用できる柔軟性を提供しています。</p>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q15</span>
+            <span class="category-tag">テスト</span>
+            <div class="question-text">
+                本システムのテストにおいて、外部APIを実際に呼び出さずにテストを実行できる理由と、その設計上のメリットを記述してください。
+            </div>
+            <div class="correct-answer">
+                <strong>模範解答</strong>
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解答例</div>
+                <p><strong>外部API非呼び出しの理由：</strong></p>
+                <ul>
+                    <li>テストコードでは<strong>モック（Mock）とスタブ（Stub）</strong>を使用して外部依存を置き換え</li>
+                    <li>Azure OpenAI APIやWeb検索APIの呼び出し部分を模擬オブジェクトで代替</li>
+                    <li><code>unittest.mock</code>モジュールを活用した依存性注入</li>
+                </ul>
+                <p><strong>設計上のメリット：</strong></p>
+                <ul>
+                    <li><strong>コスト削減:</strong> API呼び出しコストが0円（テスト実行回数に関わらず無料）</li>
+                    <li><strong>高速実行:</strong> ネットワーク遅延がなく、テストが高速に完了</li>
+                    <li><strong>再現性:</strong> 外部サービスの状態に依存せず、常に同じ結果が得られる</li>
+                    <li><strong>CI/CD対応:</strong> 自動テストパイプラインで安定して実行可能</li>
+                    <li><strong>オフライン実行:</strong> インターネット接続なしでもテスト可能</li>
+                    <li><strong>エッジケーステスト:</strong> 実際のAPIでは発生しにくいエラー状態も容易にテスト可能</li>
+                </ul>
+                <div class="key-point">
+                    <div class="key-point-title">テスト設計のベストプラクティス</div>
+                    <p>外部依存をモック化するテスト設計は、「テストピラミッド」の考え方に沿ったものです。ユニットテストは高速・低コストで大量に実行し、統合テスト・E2Eテストは必要最小限に抑えることで、効率的な品質保証を実現します。</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="01_multi-llm-reasoning_quiz.html" class="back-link">← 問題に戻る</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>マルチLLM推論システム - 解答・解説</p>
+        <p>01_multi-llm-reasoning | Azure AI Agent ハンズオン</p>
+    </footer>
+</body>
+</html>

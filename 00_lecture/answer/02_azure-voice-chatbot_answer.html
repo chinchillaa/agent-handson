@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure Voice Chatbot - 解答・解説</title>
+    <style>
+        :root {
+            --primary-blue: #0066ff;
+            --neon-cyan: #00ffff;
+            --dark-bg: #1e1e1e;
+            --darker-bg: #121212;
+            --card-bg: #2a2a2a;
+            --card-bg-light: #333333;
+            --success-green: #00ff88;
+            --warning-orange: #ffaa00;
+            --error-red: #ff4466;
+            --text-light: #ffffff;
+            --text-muted: #b0b0b0;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DejaVu Sans', 'Noto Sans JP', sans-serif;
+            line-height: 1.8;
+            color: var(--text-light);
+            background: var(--dark-bg);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
+            padding: 3rem 2rem;
+            text-align: center;
+            border-bottom: 2px solid var(--success-green);
+            position: relative;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--success-green), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--neon-cyan);
+            margin: 3rem 0 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .answer-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .question-number {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-blue), var(--neon-cyan));
+            color: var(--dark-bg);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+            padding: 1rem;
+            background: var(--darker-bg);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .correct-answer {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid var(--success-green);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .correct-answer::before {
+            content: '✓';
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: var(--success-green);
+            color: var(--dark-bg);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+        }
+
+        .explanation {
+            background: var(--card-bg-light);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .explanation-title {
+            color: var(--neon-cyan);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .explanation-title::before {
+            content: '💡';
+        }
+
+        .key-point {
+            background: rgba(0, 102, 255, 0.1);
+            border-left: 4px solid var(--primary-blue);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .key-point-title {
+            color: var(--primary-blue);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+            color: var(--text-muted);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--card-bg-light), var(--card-bg));
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: 1px solid var(--primary-blue);
+        }
+
+        .back-link:hover {
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        code {
+            background: var(--darker-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            color: var(--neon-cyan);
+        }
+
+        pre {
+            background: var(--darker-bg);
+            padding: 1rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid rgba(0, 102, 255, 0.3);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        ul li {
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .category-tag {
+            display: inline-block;
+            background: rgba(0, 255, 255, 0.1);
+            color: var(--neon-cyan);
+            padding: 0.2rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-left: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            background: var(--darker-bg);
+            color: var(--neon-cyan);
+        }
+
+        td {
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎙️ Azure Voice Chatbot</h1>
+        <p>02_azure-voice-chatbot 解答・解説</p>
+    </header>
+
+    <div class="container">
+        <!-- セクション1: アーキテクチャ -->
+        <h2 class="section-title">📐 アーキテクチャ・処理フロー</h2>
+
+        <div class="answer-card">
+            <span class="question-number">Q1</span>
+            <span class="category-tag">アーキテクチャ</span>
+            <div class="question-text">
+                Azure Voice Chatbotの音声対話における処理フローとして正しい順序を選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: C</strong> Speech-to-Text → エージェント処理 → Text-to-Speech
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p>音声対話の処理フローは以下の順序で実行されます：</p>
+                <ul>
+                    <li><strong>Step 1 - Speech-to-Text:</strong> マイクから入力された音声をテキストに変換（Azure Speech Service）</li>
+                    <li><strong>Step 2 - エージェント処理:</strong> テキストをGPT-5エージェントに送信し、応答を生成（Azure OpenAI Service）</li>
+                    <li><strong>Step 3 - Text-to-Speech:</strong> 生成された応答テキストを音声に変換して再生（Azure Speech Service）</li>
+                </ul>
+                <div class="key-point">
+                    <div class="key-point-title">レイテンシの目安</div>
+                    <p>合計2-5秒（Speech-to-Text: 0.5-1秒、GPT-5処理: 1-3秒、Text-to-Speech: 0.5-1秒）</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q2</span>
+            <span class="category-tag">アーキテクチャ</span>
+            <div class="question-text">
+                本システムで使用されているAzureサービスの組み合わせを選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: B</strong> Azure Speech Service + Azure OpenAI Service
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p>本システムは2つの主要なAzureサービスを統合しています：</p>
+                <ul>
+                    <li><strong>Azure Speech Service:</strong> Speech-to-Text（音声認識）とText-to-Speech（音声合成）を提供。Neural Voiceによる自然な日本語音声を実現。</li>
+                    <li><strong>Azure OpenAI Service:</strong> GPT-5モデルをホスティングし、自然言語処理と対話生成を担当。マルチターン対話のコンテキスト管理も実施。</li>
+                </ul>
+                <p>これらをMicrosoft Agent Framework 1.0.0b251104で統合し、シームレスな音声対話体験を実現しています。</p>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q3</span>
+            <span class="category-tag">アーキテクチャ</span>
+            <div class="question-text">
+                マルチターン対話において、Agent Frameworkの<code>thread</code>機構がどのようにコンテキスト（会話履歴）を管理しているか説明してください。
+            </div>
+            <div class="correct-answer">
+                <strong>模範解答</strong>
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解答例</div>
+                <p>Agent Frameworkの<code>thread</code>機構は以下のようにコンテキストを管理しています：</p>
+                <ul>
+                    <li><strong>スレッド作成:</strong> <code>thread.get_new_thread()</code>でセッション開始時に新しいスレッドを作成</li>
+                    <li><strong>スレッド保持:</strong> 同一セッション内では同じスレッドオブジェクトを使い回す</li>
+                    <li><strong>自動履歴管理:</strong> <code>agent.run(message, thread=thread)</code>でメッセージを送信すると、フレームワークが自動的に会話履歴をスレッドに追加</li>
+                    <li><strong>コンテキスト参照:</strong> エージェントは過去のやり取りを参照して文脈に沿った応答を生成</li>
+                </ul>
+                <pre><code># スレッド作成（セッション開始時）
+self._thread = await thread.get_new_thread()
+
+# メッセージ送信（スレッドを指定）
+result = await self._agent.run(
+    user_input,
+    thread=self._thread  # 同じスレッドを使用
+)</code></pre>
+                <div class="key-point">
+                    <div class="key-point-title">設計のメリット</div>
+                    <p>開発者が明示的に会話履歴を管理する必要がなく、Agent Frameworkが内部で自動処理します。これにより、実装がシンプルになり、バグの発生リスクも低減します。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- セクション2: 音声処理 -->
+        <h2 class="section-title">🎤 音声処理（Speech Service）</h2>
+
+        <div class="answer-card">
+            <span class="question-number">Q4</span>
+            <span class="category-tag">音声処理</span>
+            <div class="question-text">
+                <code>SpeechRecognizer</code>クラスの<code>recognize_once()</code>メソッドが返す値の型を選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: C</strong> tuple[bool, str]（成功フラグ, テキストまたはエラー）
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p><code>recognize_once()</code>メソッドは、処理結果をタプル形式で返します：</p>
+                <ul>
+                    <li><strong>成功時:</strong> <code>(True, "認識されたテキスト")</code></li>
+                    <li><strong>失敗時:</strong> <code>(False, "エラーメッセージ")</code></li>
+                </ul>
+                <p>この設計により、呼び出し側で成功/失敗の判定と結果の取得を1回の呼び出しで行えます。</p>
+                <pre><code>success, text = recognizer.recognize_once()
+if success:
+    print(f"認識結果: {text}")
+else:
+    print(f"エラー: {text}")</code></pre>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q5</span>
+            <span class="category-tag">音声処理</span>
+            <div class="question-text">
+                <code>SpeechSynthesizer</code>クラスの<code>speak_with_options()</code>メソッドで、話速（rate）パラメータの有効な範囲を選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: B</strong> 0.5 ～ 2.0
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p>話速パラメータは標準速度を1.0として、以下の範囲で調整可能です：</p>
+                <table>
+                    <tr><th>値</th><th>効果</th></tr>
+                    <tr><td>0.5</td><td>半分の速度（ゆっくり）</td></tr>
+                    <tr><td>1.0</td><td>標準速度</td></tr>
+                    <tr><td>1.5</td><td>1.5倍速（やや速い）</td></tr>
+                    <tr><td>2.0</td><td>2倍速（速い）</td></tr>
+                </table>
+                <p>音声コマンド「速く話して」では話速が0.1ずつ増加し、「ゆっくり話して」では0.1ずつ減少します（0.5～1.5の範囲内）。</p>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q6</span>
+            <span class="category-tag">音声処理</span>
+            <div class="question-text">
+                Text-to-Speechで話速やピッチを動的に制御するために使用される技術/形式の名称を選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: B</strong> SSML（Speech Synthesis Markup Language）
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p>SSML（Speech Synthesis Markup Language）は、音声合成の詳細な制御を行うためのXMLベースのマークアップ言語です。</p>
+                <pre><code>&lt;speak version="1.0" xmlns="..."&gt;
+    &lt;voice name="ja-JP-NanamiNeural"&gt;
+        &lt;prosody rate="120%" pitch="+10%" volume="+5%"&gt;
+            こんにちは、今日はいい天気ですね。
+        &lt;/prosody&gt;
+    &lt;/voice&gt;
+&lt;/speak&gt;</code></pre>
+                <p><code>&lt;prosody&gt;</code>タグで以下を制御できます：</p>
+                <ul>
+                    <li><strong>rate:</strong> 話速（50%～200%）</li>
+                    <li><strong>pitch:</strong> ピッチ（-50%～+50%）</li>
+                    <li><strong>volume:</strong> 音量</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- セクション3: 音声プロファイル -->
+        <h2 class="section-title">🗣️ 音声プロファイル</h2>
+
+        <div class="answer-card">
+            <span class="question-number">Q7</span>
+            <span class="category-tag">音声プロファイル</span>
+            <div class="question-text">
+                本システムでデフォルトの音声として設定されている日本語Neural Voiceの名前を選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: B</strong> ja-JP-NanamiNeural（ななみ）
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p>デフォルトの音声は<strong>Nanami（ななみ）</strong>で、標準的で自然な女性の声として設定されています。</p>
+                <p>利用可能な日本語Neural Voice一覧：</p>
+                <table>
+                    <tr><th>音声名</th><th>特徴</th><th>性別</th></tr>
+                    <tr><td>Nanami（ななみ）</td><td>標準的で自然</td><td>女性</td></tr>
+                    <tr><td>Mayu（まゆ）</td><td>若々しく元気</td><td>女性</td></tr>
+                    <tr><td>Shiori（しおり）</td><td>落ち着いた大人</td><td>女性</td></tr>
+                    <tr><td>Keita（けいた）</td><td>親しみやすい</td><td>男性</td></tr>
+                    <tr><td>Daichi（だいち）</td><td>落ち着いた大人</td><td>男性</td></tr>
+                    <tr><td>Naoki（なおき）</td><td>若々しく元気</td><td>男性</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q8</span>
+            <span class="category-tag">音声プロファイル</span>
+            <div class="question-text">
+                <code>VoiceProfile</code>データクラスに含まれる属性として、正しくないものを選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: C</strong> emotion（感情）
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p><code>VoiceProfile</code>データクラスに含まれる属性は以下の通りです：</p>
+                <pre><code>@dataclass
+class VoiceProfile:
+    name: str              # プロファイル名
+    voice_name: str        # Azure音声名
+    language: str          # 言語コード
+    gender: str            # 性別
+    description: str       # 説明
+    style: Optional[str]   # スタイル ✓
+    speaking_rate: float   # 話速 ✓
+    pitch: str            # ピッチ ✓</code></pre>
+                <p><code>emotion</code>（感情）は含まれていません。ただし、一部のNeural Voiceでは<code>style</code>属性で感情表現に近い設定（例：cheerful, friendly）を指定できます。</p>
+            </div>
+        </div>
+
+        <!-- セクション4: エージェント・セッション -->
+        <h2 class="section-title">🤖 エージェント・セッション管理</h2>
+
+        <div class="answer-card">
+            <span class="question-number">Q9</span>
+            <span class="category-tag">エージェント</span>
+            <div class="question-text">
+                <code>VoiceAgentSession</code>クラスの主な役割を選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: B</strong> マルチターン対話のセッションと会話履歴を管理する
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p><code>VoiceAgentSession</code>クラスは以下の機能を提供します：</p>
+                <ul>
+                    <li><strong>スレッド管理:</strong> Agent Frameworkのスレッドを作成・保持</li>
+                    <li><strong>メッセージ送信:</strong> <code>send_message()</code>でユーザー入力をエージェントに送信</li>
+                    <li><strong>会話履歴管理:</strong> <code>get_conversation_history()</code>で履歴を取得</li>
+                    <li><strong>ターン数追跡:</strong> <code>get_turn_count()</code>で対話回数を確認</li>
+                </ul>
+                <p>音声認識（A）と音声合成（C）は<code>SpeechRecognizer</code>と<code>SpeechSynthesizer</code>クラスが担当し、認証管理（D）は<code>Settings</code>と<code>AzureCliCredential</code>が担当します。</p>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q10</span>
+            <span class="category-tag">エージェント</span>
+            <div class="question-text">
+                音声対話エージェントのシステムプロンプトにおいて、「マークダウンやコードブロックを使用しない」という指示がある理由を記述してください。
+            </div>
+            <div class="correct-answer">
+                <strong>模範解答</strong>
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解答例</div>
+                <p>この指示がある理由は、<strong>出力されたテキストがText-to-Speech（音声合成）で読み上げられる</strong>ためです：</p>
+                <ul>
+                    <li><strong>マークダウン記号の読み上げ問題:</strong> <code>**太字**</code>や<code># 見出し</code>などの記号がそのまま読み上げられると不自然</li>
+                    <li><strong>コードブロックの不適切さ:</strong> プログラムコードを音声で聞いても理解しにくく、記号類の読み上げも煩雑</li>
+                    <li><strong>URL・複雑な表の問題:</strong> 長いURLや表形式のデータは音声で聞き取りにくい</li>
+                </ul>
+                <p>代わりに、システムプロンプトでは以下を指示しています：</p>
+                <ul>
+                    <li>簡潔で分かりやすい自然な文章で回答する</li>
+                    <li>URLは「詳しくはマイクロソフトの公式サイトをご覧ください」のように言葉で説明</li>
+                    <li>表形式のデータは箇条書きや順序立てた説明に変換</li>
+                </ul>
+                <div class="key-point">
+                    <div class="key-point-title">音声UIデザインの原則</div>
+                    <p>音声インターフェースでは、視覚的な整形（マークダウン）ではなく、聴覚的に理解しやすい構成（簡潔な文章、適切な区切り）が重要です。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- セクション5: 安全機構 -->
+        <h2 class="section-title">🛡️ 安全機構・エラーハンドリング</h2>
+
+        <div class="answer-card">
+            <span class="question-number">Q11</span>
+            <span class="category-tag">安全機構</span>
+            <div class="question-text">
+                <code>VoiceChat</code>クラスに実装されている安全制限として、正しくないものを選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: D</strong> MAX_TOKEN_USAGE（最大トークン使用量制限）
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p>本システムに実装されている安全制限は以下の3つです：</p>
+                <table>
+                    <tr><th>制限項目</th><th>デフォルト値</th><th>目的</th></tr>
+                    <tr><td>MAX_CONVERSATION_TURNS</td><td>50</td><td>無限ループ防止</td></tr>
+                    <tr><td>MAX_CONSECUTIVE_ERRORS</td><td>3</td><td>エラー蓄積防止</td></tr>
+                    <tr><td>MAX_SESSION_DURATION</td><td>1800秒（30分）</td><td>セッション時間制限</td></tr>
+                </table>
+                <p><code>MAX_TOKEN_USAGE</code>（トークン使用量制限）は現在の実装には含まれていません。コスト管理が必要な場合は、Azure OpenAI側のクォータ設定や、実装の拡張で対応することが考えられます。</p>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q12</span>
+            <span class="category-tag">安全機構</span>
+            <div class="question-text">
+                音声認識が失敗した場合の自動再試行回数のデフォルト値を選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: B</strong> 3回
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p>音声認識（Speech-to-Text）が失敗した場合、システムは最大<strong>3回</strong>まで自動再試行を行います。</p>
+                <ul>
+                    <li><strong>1回目の失敗:</strong> 「もう一度お話しください」と促して再試行</li>
+                    <li><strong>2回目の失敗:</strong> 同様に再試行</li>
+                    <li><strong>3回目の失敗:</strong> 再試行上限に達し、エラーカウンターが増加</li>
+                </ul>
+                <p>この再試行機能により、一時的なノイズや発話の途切れによる認識失敗を救済し、ユーザー体験を向上させています。</p>
+            </div>
+        </div>
+
+        <!-- セクション6: Phase 3機能 -->
+        <h2 class="section-title">✨ Phase 3 拡張機能</h2>
+
+        <div class="answer-card">
+            <span class="question-number">Q13</span>
+            <span class="category-tag">Phase 3</span>
+            <div class="question-text">
+                音声コマンド「要約して」を発話した場合に実行される処理を選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: C</strong> 会話履歴の要約生成
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p>Phase 3で実装された音声コマンドの一覧：</p>
+                <table>
+                    <tr><th>発話例</th><th>コマンドタイプ</th><th>処理内容</th></tr>
+                    <tr><td>「要約して」「まとめて」</td><td>summary</td><td>会話履歴の要約生成</td></tr>
+                    <tr><td>「音声を変更して」「声を変えて」</td><td>voice_change</td><td>音声プロファイル切り替え</td></tr>
+                    <tr><td>「速く話して」</td><td>speed_up</td><td>話速を0.1増加</td></tr>
+                    <tr><td>「ゆっくり話して」</td><td>speed_down</td><td>話速を0.1減少</td></tr>
+                    <tr><td>「音声をリセット」</td><td>reset_voice</td><td>デフォルト設定に復帰</td></tr>
+                </table>
+                <p><code>ConversationSummarizer</code>クラスが会話履歴を分析し、ターン数、文字数、主なトピックなどを含む要約を生成します。</p>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q14</span>
+            <span class="category-tag">Phase 3</span>
+            <div class="question-text">
+                <code>ContextManager</code>クラスが会話履歴から自動抽出する情報として、正しいものをすべて選んでください。
+            </div>
+            <div class="correct-answer">
+                <strong>正解: A, B</strong> ユーザー名、話題キーワード
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解説</div>
+                <p><code>ContextManager</code>の<code>extract_from_conversation()</code>メソッドは以下の情報を自動抽出します：</p>
+                <ul>
+                    <li><strong>ユーザー名:</strong> 「私は〇〇です」「〇〇と申します」などのパターンから検出</li>
+                    <li><strong>話題キーワード:</strong> 定義済みのキーワード（天気、プログラミング、AI、音楽、料理など）の出現を検出</li>
+                </ul>
+                <p>感情分析（C）やGPS位置情報（D）は、現在の実装には含まれていません。これらは将来の拡張候補となる機能です。</p>
+            </div>
+        </div>
+
+        <div class="answer-card">
+            <span class="question-number">Q15</span>
+            <span class="category-tag">Phase 3</span>
+            <div class="question-text">
+                本システムの実装フェーズ（Phase 1～4）において、各フェーズで実装された主要機能を簡潔に説明してください。
+            </div>
+            <div class="correct-answer">
+                <strong>模範解答</strong>
+            </div>
+            <div class="explanation">
+                <div class="explanation-title">解答例</div>
+                <table>
+                    <tr><th>フェーズ</th><th>名称</th><th>主要機能</th></tr>
+                    <tr>
+                        <td><strong>Phase 1</strong></td>
+                        <td>基本音声入出力</td>
+                        <td>
+                            <ul>
+                                <li>Azure Speech Service統合</li>
+                                <li>Speech-to-Text実装</li>
+                                <li>Text-to-Speech実装</li>
+                                <li>日本語対応</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phase 2</strong></td>
+                        <td>エージェント統合</td>
+                        <td>
+                            <ul>
+                                <li>Microsoft Agent Framework統合</li>
+                                <li>GPT-5マルチターン対話</li>
+                                <li>会話履歴管理</li>
+                                <li>セッション管理</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phase 3</strong></td>
+                        <td>機能拡張</td>
+                        <td>
+                            <ul>
+                                <li>音声コマンド処理（要約、音声変更、話速調整）</li>
+                                <li>コンテキスト管理（名前・話題抽出）</li>
+                                <li>5種類の音声プロファイル</li>
+                                <li>リアルタイム話速調整</li>
+                                <li>再試行機能</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phase 4</strong></td>
+                        <td>テスト・品質保証</td>
+                        <td>
+                            <ul>
+                                <li>95個のテスト実装</li>
+                                <li>98.9%成功率達成</li>
+                                <li>モック化（外部API非呼び出し）</li>
+                                <li>コスト見積もりドキュメント</li>
+                                <li>本番環境デプロイ準備</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+                <div class="key-point">
+                    <div class="key-point-title">段階的開発のメリット</div>
+                    <p>フェーズ分けにより、各段階で動作確認を行いながら機能を追加できます。Phase 1-2で基本機能を確立し、Phase 3で付加価値機能を追加、Phase 4で品質を担保するという流れは、アジャイル開発の考え方に沿っています。</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="02_azure-voice-chatbot_quiz.html" class="back-link">← 問題に戻る</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Azure Voice Chatbot - 解答・解説</p>
+        <p>02_azure-voice-chatbot | Azure AI Agent ハンズオン</p>
+    </footer>
+</body>
+</html>

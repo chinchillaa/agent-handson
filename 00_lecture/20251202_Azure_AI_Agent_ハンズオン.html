@@ -4,19 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Azure AI Agentハンズオン</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --azure-blue: #0078D4;
-            --azure-dark: #005A9E;
-            --azure-light: #E3F2FD;
-            --azure-lighter: #F0F7FF;
-            --success-green: #10893E;
-            --warning-orange: #FF8C00;
-            --error-red: #E81123;
-            --text-dark: #2C2C2C;
-            --text-light: #666666;
-            --bg-light: #F8F9FA;
+            /* Tech Innovation Theme */
+            --primary-blue: #0066ff;
+            --neon-cyan: #00ffff;
+            --dark-bg: #1e1e1e;
+            --darker-bg: #121212;
+            --card-bg: #2a2a2a;
+            --card-bg-light: #333333;
+            --success-green: #00ff88;
+            --warning-orange: #ffaa00;
+            --error-red: #ff4466;
+            --text-light: #ffffff;
+            --text-muted: #b0b0b0;
+            --text-subtle: #888888;
             --white: #FFFFFF;
         }
 
@@ -31,10 +33,10 @@
         }
 
         body {
-            font-family: 'Noto Sans JP', 'Roboto', sans-serif;
+            font-family: 'DejaVu Sans', 'Noto Sans JP', sans-serif;
             line-height: 1.8;
-            color: var(--text-dark);
-            background: linear-gradient(to bottom, var(--azure-lighter), var(--white));
+            color: var(--text-light);
+            background: var(--dark-bg);
         }
 
         /* ナビゲーション */
@@ -42,11 +44,12 @@
             position: fixed;
             top: 0;
             width: 100%;
-            background: rgba(255, 255, 255, 0.98);
+            background: rgba(30, 30, 30, 0.95);
             backdrop-filter: blur(10px);
-            box-shadow: 0 2px 20px rgba(0, 120, 212, 0.1);
+            box-shadow: 0 2px 20px rgba(0, 102, 255, 0.3);
             z-index: 1000;
             padding: 1rem 0;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
         }
 
         nav .container {
@@ -61,7 +64,7 @@
         nav .logo {
             font-size: 1.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--azure-blue), var(--azure-dark));
+            background: linear-gradient(135deg, var(--primary-blue), var(--neon-cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -75,14 +78,14 @@
 
         nav a {
             text-decoration: none;
-            color: var(--text-dark);
+            color: var(--text-muted);
             font-weight: 500;
             transition: all 0.3s ease;
             position: relative;
         }
 
         nav a:hover {
-            color: var(--azure-blue);
+            color: var(--neon-cyan);
         }
 
         nav a::after {
@@ -92,7 +95,7 @@
             left: 0;
             width: 0;
             height: 2px;
-            background: var(--azure-blue);
+            background: linear-gradient(90deg, var(--primary-blue), var(--neon-cyan));
             transition: width 0.3s ease;
         }
 
@@ -114,7 +117,7 @@
 
         /* ヒーローセクション */
         .hero {
-            background: linear-gradient(135deg, var(--azure-blue), var(--azure-dark));
+            background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
             color: var(--white);
             text-align: center;
             padding: 10rem 2rem 8rem;
@@ -130,8 +133,11 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="none"/><circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.03)"/></svg>');
-            opacity: 0.5;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+                url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="none"/><circle cx="50" cy="50" r="1" fill="rgba(0,255,255,0.3)"/></svg>');
+            opacity: 1;
         }
 
         .hero-content {
@@ -189,7 +195,7 @@
         .section-title h2 {
             font-size: 3rem;
             font-weight: 700;
-            color: var(--azure-dark);
+            color: var(--white);
             margin-bottom: 1rem;
             position: relative;
             display: inline-block;
@@ -203,34 +209,37 @@
             transform: translateX(-50%);
             width: 100px;
             height: 4px;
-            background: linear-gradient(90deg, var(--azure-blue), var(--azure-dark));
+            background: linear-gradient(90deg, var(--primary-blue), var(--neon-cyan));
             border-radius: 2px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
         }
 
         .section-title p {
             font-size: 1.3rem;
-            color: var(--text-light);
+            color: var(--text-muted);
             margin-top: 1.5rem;
         }
 
         /* カード */
         .card {
-            background: var(--white);
+            background: var(--card-bg);
             border-radius: 20px;
             padding: 2.5rem;
-            box-shadow: 0 10px 40px rgba(0, 120, 212, 0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
             margin-bottom: 2rem;
+            border: 1px solid rgba(0, 102, 255, 0.2);
         }
 
         .card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(0, 120, 212, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 102, 255, 0.3);
+            border-color: var(--neon-cyan);
         }
 
         .card h3 {
             font-size: 2rem;
-            color: var(--azure-dark);
+            color: var(--white);
             margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
@@ -251,23 +260,27 @@
 
         /* 成功/危険ボックス */
         .success-card {
-            background: linear-gradient(135deg, rgba(16, 137, 62, 0.05), rgba(16, 137, 62, 0.02));
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 136, 0.02));
             border-left: 6px solid var(--success-green);
+            border-color: rgba(0, 255, 136, 0.3);
         }
 
         .danger-card {
-            background: linear-gradient(135deg, rgba(232, 17, 35, 0.05), rgba(232, 17, 35, 0.02));
+            background: linear-gradient(135deg, rgba(255, 68, 102, 0.1), rgba(255, 68, 102, 0.02));
             border-left: 6px solid var(--error-red);
+            border-color: rgba(255, 68, 102, 0.3);
         }
 
         .warning-card {
-            background: linear-gradient(135deg, rgba(255, 140, 0, 0.05), rgba(255, 140, 0, 0.02));
+            background: linear-gradient(135deg, rgba(255, 170, 0, 0.1), rgba(255, 170, 0, 0.02));
             border-left: 6px solid var(--warning-orange);
+            border-color: rgba(255, 170, 0, 0.3);
         }
 
         .info-card {
-            background: linear-gradient(135deg, rgba(0, 120, 212, 0.05), rgba(0, 120, 212, 0.02));
-            border-left: 6px solid var(--azure-blue);
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.1), rgba(0, 255, 255, 0.02));
+            border-left: 6px solid var(--primary-blue);
+            border-color: rgba(0, 102, 255, 0.3);
         }
 
         /* リスト */
@@ -281,35 +294,37 @@
             padding-left: 2rem;
             position: relative;
             font-size: 1.1rem;
+            color: var(--text-muted);
         }
 
         ul li::before {
             content: '▸';
             position: absolute;
             left: 0;
-            color: var(--azure-blue);
+            color: var(--neon-cyan);
             font-weight: bold;
             font-size: 1.3rem;
         }
 
         ul li strong {
-            color: var(--azure-dark);
+            color: var(--white);
             font-weight: 600;
         }
 
         .small-text {
             font-size: 0.95rem;
-            color: var(--text-light);
+            color: var(--text-muted);
             line-height: 1.6;
         }
 
         /* 図解セクション */
         .diagram {
-            background: var(--white);
+            background: var(--card-bg);
             border-radius: 20px;
             padding: 3rem;
             margin: 3rem 0;
-            box-shadow: 0 10px 40px rgba(0, 120, 212, 0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 102, 255, 0.2);
         }
 
         .flow {
@@ -322,8 +337,8 @@
         }
 
         .flow-item {
-            background: linear-gradient(135deg, var(--azure-lighter), var(--white));
-            border: 3px solid var(--azure-blue);
+            background: linear-gradient(135deg, var(--card-bg-light), var(--card-bg));
+            border: 2px solid var(--primary-blue);
             border-radius: 20px;
             padding: 2rem;
             min-width: 200px;
@@ -333,7 +348,8 @@
 
         .flow-item:hover {
             transform: scale(1.1);
-            box-shadow: 0 15px 40px rgba(0, 120, 212, 0.3);
+            box-shadow: 0 15px 40px rgba(0, 102, 255, 0.4), 0 0 30px rgba(0, 255, 255, 0.2);
+            border-color: var(--neon-cyan);
         }
 
         .flow-item .icon {
@@ -344,14 +360,15 @@
         .flow-item strong {
             display: block;
             font-size: 1.3rem;
-            color: var(--azure-dark);
+            color: var(--white);
             margin-bottom: 0.5rem;
         }
 
         .flow-arrow {
             font-size: 3rem;
-            color: var(--azure-blue);
+            color: var(--neon-cyan);
             font-weight: bold;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
         }
 
         /* バッジ */
@@ -364,19 +381,21 @@
         }
 
         .badge {
-            background: var(--azure-blue);
+            background: linear-gradient(135deg, var(--primary-blue), rgba(0, 102, 255, 0.8));
             color: var(--white);
             padding: 0.8rem 1.5rem;
             border-radius: 30px;
             font-weight: 600;
             font-size: 1.1rem;
-            box-shadow: 0 4px 15px rgba(0, 120, 212, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 102, 255, 0.4);
             transition: all 0.3s ease;
+            border: 1px solid rgba(0, 255, 255, 0.3);
         }
 
         .badge:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 120, 212, 0.4);
+            box-shadow: 0 8px 25px rgba(0, 255, 255, 0.4);
+            border-color: var(--neon-cyan);
         }
 
         /* タイムライン */
@@ -393,8 +412,9 @@
             transform: translateX(-50%);
             width: 4px;
             height: 100%;
-            background: linear-gradient(to bottom, var(--azure-blue), var(--azure-dark));
+            background: linear-gradient(to bottom, var(--primary-blue), var(--neon-cyan));
             border-radius: 2px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
         }
 
         .timeline-item {
@@ -414,16 +434,18 @@
 
         .timeline-content {
             width: 45%;
-            background: var(--white);
+            background: var(--card-bg);
             padding: 2.5rem;
             border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 120, 212, 0.15);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
+            border: 1px solid rgba(0, 102, 255, 0.2);
         }
 
         .timeline-content:hover {
             transform: scale(1.05);
-            box-shadow: 0 15px 50px rgba(0, 120, 212, 0.25);
+            box-shadow: 0 15px 50px rgba(0, 102, 255, 0.3);
+            border-color: var(--neon-cyan);
         }
 
         .timeline-marker {
@@ -432,21 +454,21 @@
             transform: translateX(-50%);
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, var(--azure-blue), var(--azure-dark));
+            background: linear-gradient(135deg, var(--primary-blue), var(--neon-cyan));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--white);
+            color: var(--dark-bg);
             font-size: 2rem;
             font-weight: 700;
-            box-shadow: 0 8px 25px rgba(0, 120, 212, 0.4);
+            box-shadow: 0 8px 25px rgba(0, 255, 255, 0.4), 0 0 40px rgba(0, 255, 255, 0.2);
             z-index: 10;
         }
 
         .timeline-content h3 {
             font-size: 1.8rem;
-            color: var(--azure-dark);
+            color: var(--white);
             margin-bottom: 1.5rem;
         }
 
@@ -460,17 +482,19 @@
         }
 
         .comparison-item {
-            background: var(--white);
+            background: var(--card-bg);
             border-radius: 20px;
             padding: 2.5rem;
             text-align: center;
-            box-shadow: 0 10px 40px rgba(0, 120, 212, 0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
+            border: 1px solid rgba(0, 102, 255, 0.2);
         }
 
         .comparison-item:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(0, 120, 212, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 102, 255, 0.3);
+            border-color: var(--neon-cyan);
         }
 
         .comparison-item .icon {
@@ -480,37 +504,58 @@
 
         .comparison-item h4 {
             font-size: 1.8rem;
-            color: var(--azure-dark);
+            color: var(--white);
             margin-bottom: 1rem;
+        }
+
+        .comparison-item p {
+            color: var(--text-muted);
         }
 
         .comparison-operator {
             font-size: 3rem;
             font-weight: bold;
-            color: var(--azure-blue);
+            color: var(--neon-cyan);
             display: flex;
             align-items: center;
             justify-content: center;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
         }
 
         .result-item {
-            background: linear-gradient(135deg, var(--azure-light), var(--white));
-            border: 4px solid var(--azure-blue);
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.2), rgba(0, 255, 255, 0.1));
+            border: 2px solid var(--neon-cyan);
             transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
         }
 
         /* まとめセクション */
         .summary {
-            background: linear-gradient(135deg, var(--azure-blue), var(--azure-dark));
+            background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
             color: var(--white);
             padding: 6rem 2rem;
             text-align: center;
+            position: relative;
+        }
+
+        .summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 30% 70%, rgba(0, 102, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
         }
 
         .summary h2 {
             font-size: 3rem;
             margin-bottom: 3rem;
             color: var(--white);
+            position: relative;
         }
 
         .summary-grid {
@@ -519,20 +564,23 @@
             gap: 3rem;
             max-width: 1200px;
             margin: 0 auto;
+            position: relative;
         }
 
         .summary-card {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 102, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 2.5rem;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(0, 255, 255, 0.2);
             transition: all 0.3s ease;
         }
 
         .summary-card:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(0, 102, 255, 0.2);
             transform: translateY(-10px);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 20px 40px rgba(0, 255, 255, 0.2);
         }
 
         .summary-card .icon {
@@ -549,19 +597,20 @@
         .summary-card p {
             font-size: 1.1rem;
             line-height: 1.8;
-            opacity: 0.95;
+            color: var(--text-muted);
         }
 
         /* フッター */
         footer {
-            background: var(--text-dark);
+            background: var(--darker-bg);
             color: var(--white);
             text-align: center;
             padding: 3rem 2rem;
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
         }
 
         footer p {
-            opacity: 0.8;
+            color: var(--text-muted);
             font-size: 1.1rem;
         }
 
@@ -741,7 +790,7 @@
     </section>
 
     <!-- そもそもAIエージェントとは：仕組み -->
-    <section id="mechanism" style="background: var(--azure-lighter);">
+    <section id="mechanism" style="background: var(--darker-bg);">
         <div class="container">
             <div class="section-title">
                 <h2>AIエージェントの仕組み</h2>
@@ -758,7 +807,7 @@
 
                     <div class="flow-arrow">→</div>
 
-                    <div class="flow-item" style="background: linear-gradient(135deg, var(--azure-blue), var(--azure-dark)); color: white;">
+                    <div class="flow-item" style="background: linear-gradient(135deg, var(--primary-blue), rgba(0, 255, 255, 0.3)); color: white; border-color: var(--neon-cyan); box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);">
                         <div class="icon">🤖</div>
                         <strong style="color: white;">AIエージェント</strong>
                         <span class="small-text" style="color: rgba(255,255,255,0.9);">LLMによる思考・判断</span>
@@ -773,7 +822,7 @@
                     </div>
                 </div>
 
-                <h3 style="text-align: center; margin: 3rem 0 2rem; color: var(--azure-dark);">外部ツールの例</h3>
+                <h3 style="text-align: center; margin: 3rem 0 2rem; color: var(--neon-cyan);">外部ツールの例</h3>
                 <div class="badges">
                     <span class="badge">📧 メール</span>
                     <span class="badge">🗄️ データベース</span>
@@ -816,7 +865,7 @@
                 </div>
             </div>
 
-            <div style="text-align: center; font-size: 3rem; margin: 2rem 0; color: var(--azure-blue);">
+            <div style="text-align: center; font-size: 3rem; margin: 2rem 0; color: var(--neon-cyan); text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);">
                 ‖
             </div>
 
@@ -831,7 +880,7 @@
     </section>
 
     <!-- 開発ロードマップ -->
-    <section id="roadmap" style="background: var(--azure-lighter);">
+    <section id="roadmap" style="background: var(--darker-bg);">
         <div class="container">
             <div class="section-title">
                 <h2>開発ロードマップ</h2>
@@ -892,11 +941,11 @@
                     <div class="timeline-content">
                         <h3>評価設計</h3>
                         <div style="margin-top: 1.5rem;">
-                            <h4 style="color: var(--azure-dark);">📊 オフライン評価</h4>
+                            <h4 style="color: var(--neon-cyan);">📊 オフライン評価</h4>
                             <p class="small-text">例）予測精度(MAEなど) <span class="badge" style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">80％以上</span> / 応答速度 <span class="badge" style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">10s以内</span></p>
                         </div>
                         <div style="margin-top: 1.5rem;">
-                            <h4 style="color: var(--azure-dark);">👥 オンライン評価</h4>
+                            <h4 style="color: var(--neon-cyan);">👥 オンライン評価</h4>
                             <p class="small-text">例）ユーザー満足度 <span class="badge" style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">4.0以上</span> / 問い合わせ解決率 <span class="badge" style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">70％以上</span></p>
                         </div>
                     </div>
