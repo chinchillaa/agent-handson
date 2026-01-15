@@ -720,6 +720,47 @@ uv pip install -r requirements.txt</code></pre>
             </div>
         </section>
 
+        <!-- クイックスタート セクション -->
+        <section id="quickstart">
+            <h2>⚡ クイックスタート - 動作確認方法</h2>
+            <p>git cloneおよびuv syncした状態から、以下のコマンドで動作確認ができます。</p>
+
+            <div class="card" style="background: rgba(0, 255, 136, 0.1); border-left: 4px solid var(--success-green); margin: 2rem 0;">
+                <h4 style="color: var(--success-green); margin-bottom: 1rem;">🎤 Azure Voice Chatbotの実行</h4>
+                <pre><code style="color: var(--neon-cyan);">cd 02_azure-voice-chatbot
+uv run python main.py</code></pre>
+                <p style="margin-top: 1rem; color: var(--text-muted);">
+                    <strong>期待される動作:</strong><br>
+                    ✓ ローカルサーバーが起動<br>
+                    ✓ コンソールにアクセスURLが表示される<br>
+                    ✓ ブラウザでUIが起動<br>
+                    ✓ マイク入力で音声認識が動作<br>
+                    ✓ AIエージェントが処理して音声で応答<br>
+                </p>
+            </div>
+
+            <div class="card" style="background: rgba(0, 255, 136, 0.05); border-left: 4px solid var(--warning-orange); margin: 2rem 0;">
+                <h4 style="color: var(--warning-orange); margin-bottom: 1rem;">📝 トラブルシューティング</h4>
+                <ul style="color: var(--text-muted);">
+                    <li><strong>モジュールが見つからないエラー:</strong> <code style="background: var(--darker-bg); padding: 0.2rem 0.5rem; border-radius: 3px;">uv sync</code> を再実行してください</li>
+                    <li><strong>Azure OpenAI APIエラー:</strong> <code style="background: var(--darker-bg); padding: 0.2rem 0.5rem; border-radius: 3px;">.env</code> ファイルの認証情報を確認してください</li>
+                    <li><strong>マイクが検出されない:</strong> ブラウザの使用許可を確認し、システム設定でマイクアクセスを許可してください</li>
+                    <li><strong>ポートが既に使用されている:</strong> 既存プロセスを終了するか、別のポートを指定してください</li>
+                </ul>
+            </div>
+
+            <div class="card" style="background: rgba(0, 102, 255, 0.05); border-left: 4px solid var(--neon-cyan); margin: 2rem 0;">
+                <h4 style="color: var(--neon-cyan); margin-bottom: 1rem;">💡 操作ガイド</h4>
+                <ul style="color: var(--text-muted);">
+                    <li><strong>マイク入力開始:</strong> 「🎤 開始」ボタンをクリック</li>
+                    <li><strong>音声認識中:</strong> 赤いインジケーターが表示される</li>
+                    <li><strong>処理中:</strong> 「処理中...」メッセージが表示される</li>
+                    <li><strong>結果確認:</strong> テキスト表示と音声出力の両方で確認可能</li>
+                    <li><strong>セッション履歴:</strong> 会話履歴が画面左側に保存される</li>
+                </ul>
+            </div>
+        </section>
+
         <!-- NEXT STEP セクション -->
         <section id="nextstep">
             <h2>🚀 NEXT STEP - 実務で追加が必要なこと</h2>

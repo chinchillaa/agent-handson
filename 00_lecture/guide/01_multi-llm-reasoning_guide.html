@@ -603,6 +603,48 @@ Researcherに対する具体的な調査依頼
             </div>
         </section>
 
+        <!-- クイックスタート セクション -->
+        <section id="quickstart">
+            <h2>⚡ クイックスタート - 動作確認方法</h2>
+            <p>git cloneおよびuv syncした状態から、以下のコマンドで動作確認ができます。</p>
+
+            <div class="card" style="background: rgba(0, 102, 255, 0.1); border-left: 4px solid var(--success-green); margin: 2rem 0;">
+                <h4 style="color: var(--success-green); margin-bottom: 1rem;">📋 Step 1: マルチLLM推論システムの実行</h4>
+                <pre><code style="color: var(--neon-cyan);">cd 01_multi-llm-reasoning
+uv run python main.py "量子コンピューターとは何ですか？"</code></pre>
+                <p style="margin-top: 1rem; color: var(--text-muted);">
+                    <strong>期待される動作:</strong><br>
+                    ✓ Coordinatorが質問を分析し調査計画を立案<br>
+                    ✓ Researcherが情報を収集<br>
+                    ✓ Analyzerが多角的に分析<br>
+                    ✓ Summarizerが最終回答を生成<br>
+                    所要時間: 約30-60秒
+                </p>
+            </div>
+
+            <div class="card" style="background: rgba(0, 255, 136, 0.1); border-left: 4px solid var(--success-green); margin: 2rem 0;">
+                <h4 style="color: var(--success-green); margin-bottom: 1rem;">🎤 Step 2: Azure Voice Chatbotの実行</h4>
+                <pre><code style="color: var(--neon-cyan);">cd ../02_azure-voice-chatbot
+uv run python main.py</code></pre>
+                <p style="margin-top: 1rem; color: var(--text-muted);">
+                    <strong>期待される動作:</strong><br>
+                    ✓ ローカルサーバーが起動<br>
+                    ✓ ブラウザで音声インタラクションが可能<br>
+                    ✓ 音声入力 → AIエージェント処理 → 音声出力<br>
+                    アクセスURL: http://localhost:8000 (コンソールに表示)
+                </p>
+            </div>
+
+            <div class="card" style="background: rgba(0, 255, 136, 0.05); border-left: 4px solid var(--warning-orange); margin: 2rem 0;">
+                <h4 style="color: var(--warning-orange); margin-bottom: 1rem;">📝 トラブルシューティング</h4>
+                <ul style="color: var(--text-muted);">
+                    <li><strong>モジュールが見つからないエラー:</strong> <code style="background: var(--darker-bg); padding: 0.2rem 0.5rem; border-radius: 3px;">uv sync</code> を再実行してください</li>
+                    <li><strong>Azure OpenAI APIエラー:</strong> <code style="background: var(--darker-bg); padding: 0.2rem 0.5rem; border-radius: 3px;">.env</code> ファイルの認証情報を確認してください</li>
+                    <li><strong>ポートが既に使用されている:</strong> 既存プロセスを終了するか、別のポートを指定してください</li>
+                </ul>
+            </div>
+        </section>
+
         <!-- NEXT STEP セクション -->
         <section id="nextstep">
             <h2>🚀 NEXT STEP - 実務で追加が必要なこと</h2>
